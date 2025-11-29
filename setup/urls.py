@@ -19,6 +19,9 @@ urlpatterns = [
     
     path('perfil/', user_views.editar_perfil, name='editar_perfil'),
     path('agendamento/', include('agendamento.urls')),
+    
+    path('notificacoes/', include('notificacoes.urls')),
+
 ]
 
 if settings.DEBUG:

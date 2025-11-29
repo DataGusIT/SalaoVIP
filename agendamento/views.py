@@ -10,6 +10,8 @@ from django.http import JsonResponse
 from datetime import datetime, timedelta, time
 from django.utils.timezone import make_aware 
 
+# IMPORTAÇÃO DA FUNÇÃO DE NOTIFICAÇÃO
+from notificacoes.utils import criar_notificacao
 
 @login_required
 def novo_agendamento(request):
@@ -23,8 +25,14 @@ def novo_agendamento(request):
                 # O full_clean() chama o clean() do model onde está nossa validação de horário
                 agendamento.full_clean() 
                 agendamento.save()
+                
+                # --- NOTIFICAÇÃO: AVISA O PROFISSIONAL ---
+                msg_prof = f"Novo agendamento: {request.user.first_name or request.user.username} marcou {agendamento.servico.nome} para {agendamento.data_hora_inicio.strftime('%d/%m às %H:%M')}."
+                criar_notificacao(agendamento.profissional, msg_prof, link='/agendamento/meus-agendamentos/')
+                # -----------------------------------------
+
                 messages.success(request, 'Agendamento realizado com sucesso!')
-                return redirect('listar_agendamentos') # Vamos criar essa rota já já
+                return redirect('listar_agendamentos')
             except Exception as e:
                 # Se der erro de validação (horário ocupado), aparece aqui
                 messages.error(request, e)
@@ -98,6 +106,13 @@ def mudar_status(request, agendamento_id, novo_status):
     if novo_status in ['CONCLUIDO', 'CANCELADO', 'NAO_COMPARECEU']:
         agendamento.status = novo_status
         agendamento.save()
+        
+        # --- NOTIFICAÇÃO: SE O PROFISSIONAL CANCELAR, AVISA O CLIENTE ---
+        if novo_status == 'CANCELADO':
+            msg_cli = f"Atenção: Seu agendamento de {agendamento.data_hora_inicio.strftime('%d/%m às %H:%M')} foi cancelado pelo profissional."
+            criar_notificacao(agendamento.cliente, msg_cli)
+        # ---------------------------------------------------------------
+
         messages.success(request, f"Status atualizado para {agendamento.get_status_display()}")
     
     return redirect('listar_agendamentos')
@@ -347,5 +362,11 @@ def cancelar_agendamento(request, agendamento_id):
     # 3. Cancela
     agendamento.status = 'CANCELADO'
     agendamento.save()
+    
+    # --- NOTIFICAÇÃO: AVISA O PROFISSIONAL ---
+    msg_canc = f"Cancelamento: {request.user.first_name or request.user.username} cancelou o horário de {agendamento.data_hora_inicio.strftime('%d/%m às %H:%M')}."
+    criar_notificacao(agendamento.profissional, msg_canc)
+    # -----------------------------------------
+
     messages.success(request, "Agendamento cancelado com sucesso.")
     return redirect('listar_agendamentos')
