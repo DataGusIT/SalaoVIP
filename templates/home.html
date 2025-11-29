@@ -4,101 +4,236 @@
 
 {% block extra_head %}
 <style>
-    /* Estilo exclusivo para a Home */
+    /* --- HERO SECTION (Mantida) --- */
     .hero-section {
         background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
         color: #fff;
-        padding: 4rem 2rem;
-        border-radius: 20px;
+        padding: 5rem 2rem;
+        border-radius: 24px;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
     }
 
-    /* Círculo decorativo dourado no fundo */
     .hero-section::before {
         content: '';
         position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, rgba(197, 160, 89, 0.1) 0%, rgba(0,0,0,0) 70%);
+        top: -100px;
+        right: -100px;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, rgba(0,0,0,0) 70%);
         border-radius: 50%;
         z-index: 0;
     }
 
-    .hero-content {
-        position: relative;
-        z-index: 1;
-    }
+    .hero-content { position: relative; z-index: 1; }
+    .text-gold { color: #c5a059; }
 
-    .text-gold {
-        color: #c5a059;
-    }
-
-    /* Cards de Destaque */
+    /* --- CARDS DE DESTAQUE --- */
     .feature-card {
         border: none;
         background: #fff;
-        padding: 2rem;
-        border-radius: 16px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        padding: 2.5rem 2rem;
+        border-radius: 20px;
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
         height: 100%;
+        border: 1px solid rgba(0,0,0,0.02);
     }
 
     .feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.06);
+        border-color: transparent;
     }
 
     .icon-box {
-        width: 60px;
-        height: 60px;
-        background-color: #f8f9fa;
+        width: 64px;
+        height: 64px;
+        background-color: #fcfcfc;
         color: #c5a059;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
-        font-size: 1.5rem;
+        border-radius: 16px;
+        font-size: 1.6rem;
         margin-bottom: 1.5rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
-      /* Cards Profissionais */
+
+    /* --- CARDS DE PROFISSIONAIS --- */
     .pro-card {
         border: none;
         background: #fff;
-        border-radius: 20px;
+        border-radius: 24px;
         overflow: hidden;
-        transition: transform 0.3s ease;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
         height: 100%;
+        position: relative;
     }
-    .pro-card:hover { transform: translateY(-5px); }
-    .pro-avatar {
-        width: 100px; height: 100px; object-fit: cover;
-        border-radius: 50%;
-        border: 3px solid #c5a059;
-        margin-top: -50px;
-        background: #fff;
+
+    .pro-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
     }
+
     .pro-cover {
-        height: 120px;
-        background: #333;
-        /* Se tiver foto de portfolio, usa a primeira como capa, senão usa cinza */
+        height: 140px;
+        background: linear-gradient(45deg, #333, #1a1a1a);
         background-size: cover;
         background-position: center;
+        position: relative;
+    }
+    
+    .pro-cover::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+    }
+
+    .pro-avatar {
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        margin-top: -60px;
+        background: #fff;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s;
+    }
+    
+    .pro-card:hover .pro-avatar {
+        transform: scale(1.05);
+        border-color: #c5a059;
+    }
+
+    .pro-info { padding: 1rem 1.5rem 1.5rem 1.5rem; }
+
+    .pro-name {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #1a1a1a;
+        margin-bottom: 0.2rem;
+    }
+
+    .pro-role {
+        color: #c5a059;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        margin-bottom: 1.2rem;
+    }
+
+    .pro-gallery img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+    .pro-gallery img:hover { 
+        transform: scale(1.1); 
+        z-index: 5; 
+        border-color: #c5a059;
+    }
+
+    .btn-card-action {
+        width: 100%;
+        border-radius: 12px;
+        padding: 0.6rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    /* --- ESTILO DO MODAL DE ZOOM E NAVEGAÇÃO --- */
+    #modalZoom .modal-content {
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+        position: relative; /* Para posicionar as setas */
+    }
+    
+    #modalZoom .modal-backdrop.show { opacity: 0.9; }
+
+    #imgZoom {
+        max-height: 85vh;
+        width: auto;
+        max-width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        object-fit: contain;
+    }
+
+    .btn-close-zoom {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        color: #fff;
+        background: transparent;
+        border: none;
+        font-size: 2rem;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+        z-index: 1060;
+    }
+    .btn-close-zoom:hover { opacity: 1; transform: scale(1.1); }
+
+    /* Estilo das Setas de Navegação */
+    .modal-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.2);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px);
+        z-index: 1055;
+    }
+
+    .modal-nav-btn:hover {
+        background: rgba(197, 160, 89, 0.9); /* Dourado no hover */
+        border-color: #c5a059;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .modal-nav-prev { left: -60px; } /* Posiciona fora da imagem */
+    .modal-nav-next { right: -60px; }
+
+    /* Ajuste para mobile: setas em cima da imagem */
+    @media (max-width: 768px) {
+        .modal-nav-prev { left: 10px; }
+        .modal-nav-next { right: 10px; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 
+<!-- HERO SECTION -->
 <div class="hero-section mb-5 text-center text-lg-start">
     <div class="row align-items-center">
         <div class="col-lg-7 hero-content py-3">
-            <span class="badge bg-white text-dark mb-3 px-3 py-2 rounded-pill fw-medium">
-                <i class="fas fa-star text-warning me-1"></i> Experiência Premium
+            <span class="badge bg-white text-dark mb-3 px-3 py-2 rounded-pill fw-medium shadow-sm">
+                <i class="fas fa-crown text-warning me-1"></i> Experiência Premium
             </span>
             <h1 class="display-4 fw-bold mb-3">
                 Realce sua <span class="text-gold">Melhor Versão</span>
@@ -128,97 +263,187 @@
         </div>
         
         <div class="col-lg-5 d-none d-lg-block text-center hero-content">
-            <i class="fas fa-crown" style="font-size: 10rem; color: rgba(255,255,255,0.05);"></i>
+            <i class="fas fa-cut" style="font-size: 12rem; color: rgba(255,255,255,0.03); transform: rotate(-45deg);"></i>
         </div>
     </div>
 </div>
 
+<!-- FEATURES -->
 <div class="row g-4 mb-5">
     <div class="col-md-4">
         <div class="feature-card text-center text-md-start">
             <div class="icon-box mx-auto mx-md-0">
-                <i class="fas fa-cut"></i>
+                <i class="fas fa-star"></i>
             </div>
             <h4 class="h5 fw-bold">Profissionais Elite</h4>
-            <p class="text-muted small">Nossa equipe é formada pelos melhores especialistas em cortes e estilo da região.</p>
+            <p class="text-muted small">Equipe selecionada rigorosamente, especialistas em visagismo e tendências.</p>
         </div>
     </div>
     <div class="col-md-4">
         <div class="feature-card text-center text-md-start">
             <div class="icon-box mx-auto mx-md-0">
-                <i class="fas fa-clock"></i>
+                <i class="fas fa-stopwatch"></i>
             </div>
             <h4 class="h5 fw-bold">Pontualidade VIP</h4>
-            <p class="text-muted small">Respeitamos seu tempo. Seu atendimento começa exatamente no horário agendado.</p>
+            <p class="text-muted small">Respeitamos seu tempo. Atendimento pontual e sem filas de espera.</p>
         </div>
     </div>
     <div class="col-md-4">
         <div class="feature-card text-center text-md-start">
             <div class="icon-box mx-auto mx-md-0">
-                <i class="fas fa-mobile-alt"></i>
+                <i class="fas fa-smartphone"></i>
             </div>
-            <h4 class="h5 fw-bold">Gestão Fácil</h4>
-            <p class="text-muted small">Controle seus agendamentos, remarque e visualize seu histórico direto pelo celular.</p>
+            <h4 class="h5 fw-bold">100% Digital</h4>
+            <p class="text-muted small">Controle total na palma da mão. Agende, remarque e avalie pelo app.</p>
         </div>
     </div>
 </div>
 
-<!-- SEÇÃO DE PROFISSIONAIS (VITRINE) -->
-<div class="mb-5">
+<!-- VITRINE DE PROFISSIONAIS -->
+<div class="py-4">
     <div class="text-center mb-5">
-        <h2 class="fw-bold display-6" style="font-family: 'Outfit';">Nossos Especialistas</h2>
-        <p class="text-muted">Conheça os talentos que transformam o seu visual</p>
+        <span class="text-gold text-uppercase fw-bold small letter-spacing-2">Nosso Time</span>
+        <h2 class="fw-bold display-6 mt-1" style="font-family: 'Outfit';">Especialistas em Estilo</h2>
+        <div style="width: 50px; height: 3px; background: #c5a059; margin: 1.5rem auto;"></div>
     </div>
 
     <div class="row g-4">
         {% for prof in profissionais %}
         <div class="col-md-6 col-lg-3">
-            <div class="pro-card text-center pb-4">
-                <!-- Capa (Pega a 1ª foto do portfolio ou usa padrão) -->
+            <div class="pro-card text-center">
+                <!-- Capa -->
                 <div class="pro-cover" 
                      style="{% if prof.portfolio.first %}background-image: url('{{ prof.portfolio.first.imagem.url }}');{% endif %}">
                 </div>
                 
                 <!-- Avatar -->
-                {% if prof.foto %}
-                    <img src="{{ prof.foto.url }}" class="pro-avatar shadow-sm">
-                {% else %}
-                    <div class="pro-avatar shadow-sm d-flex align-items-center justify-content-center mx-auto bg-light fs-3 text-muted">
-                        {{ prof.username|first|upper }}
-                    </div>
-                {% endif %}
+                <div class="position-relative">
+                    {% if prof.foto %}
+                        <img src="{{ prof.foto.url }}" class="pro-avatar">
+                    {% else %}
+                        <div class="pro-avatar d-flex align-items-center justify-content-center mx-auto bg-light fs-2 text-muted">
+                            {{ prof.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
 
-                <div class="px-3 mt-3">
-                    <h5 class="fw-bold mb-1">{{ prof.first_name }} {{ prof.last_name }}</h5>
-                    <p class="text-muted small text-uppercase mb-3">Cabeleireiro VIP</p>
+                <div class="pro-info">
+                    <h5 class="pro-name">{{ prof.first_name }} {{ prof.last_name }}</h5>
+                    <div class="pro-role">Cabeleireiro VIP</div>
                     
-                    <!-- Mini Galeria (3 fotos) -->
-                    <div class="d-flex justify-content-center gap-1 mb-3">
-                        {% for item in prof.portfolio.all|slice:":3" %}
-                            <img src="{{ item.imagem.url }}" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
-                        {% empty %}
-                            <small class="text-muted fst-italic" style="font-size: 0.7rem;">Sem fotos de portfólio.</small>
-                        {% endfor %}
+                    <!-- Portfolio Preview COM NAVEGAÇÃO -->
+                    {% if prof.portfolio.all %}
+                    <div class="pro-gallery d-flex justify-content-center gap-2 mb-4">
+                        {% with fotos=prof.portfolio.all|slice:":3" %}
+                            {% for item in fotos %}
+                                <img src="{{ item.imagem.url }}" 
+                                     alt="Portfolio" 
+                                     onclick="abrirGaleria({{ forloop.counter0 }}, [{% for f in fotos %}'{{ f.imagem.url }}'{% if not forloop.last %},{% endif %}{% endfor %}])"
+                                     title="Clique para ampliar">
+                            {% endfor %}
+                        {% endwith %}
                     </div>
+                    {% else %}
+                    <div class="mb-4 text-muted small py-2 fst-italic opacity-50">
+                        Visualizando portfólio...
+                    </div>
+                    {% endif %}
 
+                    <!-- Botão -->
                     {% if user.is_authenticated %}
-                        <a href="{% url 'novo_agendamento' %}?prof={{ prof.id }}" class="btn btn-outline-dark btn-sm rounded-pill w-75">
-                            Agendar
+                        <a href="{% url 'novo_agendamento' %}?prof={{ prof.id }}" class="btn btn-vip btn-card-action">
+                            Agendar Horário
                         </a>
                     {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-sm rounded-pill w-75">
-                            Ver Perfil
+                        <a href="{% url 'login' %}" class="btn btn-outline-vip btn-card-action">
+                            Ver Perfil Completo
                         </a>
                     {% endif %}
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="col-12 text-center">
-            <p class="text-muted">Nenhum profissional cadastrado no momento.</p>
+        <div class="col-12 text-center py-5">
+            <div class="opacity-50 mb-3"><i class="fas fa-user-tie fa-3x"></i></div>
+            <p class="text-muted">Nenhum profissional disponível no momento.</p>
         </div>
         {% endfor %}
     </div>
 </div>
 
+<!-- MODAL DE ZOOM COM NAVEGAÇÃO -->
+<div class="modal fade" id="modalZoom" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content text-center position-relative d-flex justify-content-center align-items-center">
+            
+            <div class="modal-body p-0 position-relative d-inline-block">
+                <!-- Botão Fechar -->
+                <button type="button" class="btn-close-zoom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <!-- Botão Anterior -->
+                <button class="modal-nav-btn modal-nav-prev" onclick="navegarFoto(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <!-- Imagem -->
+                <img src="" id="imgZoom" alt="Zoom Foto">
+
+                <!-- Botão Próximo -->
+                <button class="modal-nav-btn modal-nav-next" onclick="navegarFoto(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Variáveis globais para controlar a navegação
+    let imagensAtuais = [];
+    let indiceAtual = 0;
+
+    // Função chamada ao clicar na miniatura
+    function abrirGaleria(index, listaImagens) {
+        indiceAtual = index;
+        imagensAtuais = listaImagens; // Recebe a lista de URLs daquele profissional
+        
+        atualizarModalImagem();
+        
+        var modal = new bootstrap.Modal(document.getElementById('modalZoom'));
+        modal.show();
+    }
+
+    // Função chamada pelas setas
+    function navegarFoto(direcao) {
+        indiceAtual += direcao;
+
+        // Loop infinito: se passar do fim, volta pro começo e vice-versa
+        if (indiceAtual >= imagensAtuais.length) {
+            indiceAtual = 0;
+        } else if (indiceAtual < 0) {
+            indiceAtual = imagensAtuais.length - 1;
+        }
+
+        atualizarModalImagem();
+    }
+
+    // Atualiza o src da imagem no modal
+    function atualizarModalImagem() {
+        var imgElement = document.getElementById('imgZoom');
+        imgElement.src = imagensAtuais[indiceAtual];
+        
+        // Esconde as setas se tiver só 1 foto
+        if(imagensAtuais.length <= 1) {
+            document.querySelectorAll('.modal-nav-btn').forEach(btn => btn.style.display = 'none');
+        } else {
+            document.querySelectorAll('.modal-nav-btn').forEach(btn => btn.style.display = 'flex');
+        }
+    }
+</script>
 {% endblock %}

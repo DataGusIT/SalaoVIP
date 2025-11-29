@@ -122,12 +122,43 @@
     input[type="file"]::file-selector-button:hover {
         background: #e0e0e0;
     }
-     /* Estilo da Galeria */
+    
+    /* Estilo da Galeria */
     .portfolio-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; group; }
     .portfolio-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
     .portfolio-item:hover .portfolio-img { transform: scale(1.05); }
     .delete-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
     .portfolio-item:hover .delete-overlay { opacity: 1; }
+
+    /* --- ESTILOS DO MODAL VIP (ADICIONADO) --- */
+    .modal-vip .modal-content {
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    .modal-vip .modal-header { border-bottom: none; padding: 2rem 2rem 0.5rem 2rem; }
+    .modal-vip .modal-body { padding: 1rem 2rem 2rem 2rem; text-align: center; }
+    .modal-vip .modal-footer { border-top: none; padding: 0 2rem 2rem 2rem; justify-content: center; gap: 10px; }
+    
+    .icon-box-danger {
+        width: 80px;
+        height: 80px;
+        background-color: #fcebeb;
+        color: #dc3545;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem auto;
+        font-size: 2rem;
+        animation: pulse-red 2s infinite;
+    }
+
+    @keyframes pulse-red {
+        0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
 </style>
 {% endblock %}
 
@@ -237,9 +268,12 @@
                                     <div class="portfolio-item shadow-sm">
                                         <img src="{{ item.imagem.url }}" class="portfolio-img">
                                         <div class="delete-overlay">
-                                            <a href="{% url 'deletar_foto_portfolio' item.id %}" class="btn btn-danger btn-sm rounded-circle">
+                                            <!-- BOTÃO DE EXCLUSÃO ATUALIZADO PARA ABRIR MODAL -->
+                                            <button type="button" 
+                                                    class="btn btn-danger btn-sm rounded-circle" 
+                                                    onclick="abrirModalExclusao('{% url 'deletar_foto_portfolio' item.id %}')">
                                                 <i class="fas fa-trash"></i>
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -259,7 +293,7 @@
     </div>
 </div>
 
-<!-- MODAL DE UPLOAD DE FOTO -->
+<!-- MODAL DE UPLOAD DE FOTO (JÁ EXISTENTE) -->
 <div class="modal fade" id="modalPortfolio" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow">
@@ -287,6 +321,34 @@
         </div>
     </div>
 </div>
+
+<!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO (NOVO, ESTILO VIP) -->
+<div class="modal fade modal-vip" id="modalConfirmarExclusao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="icon-box-danger">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h4 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;">Excluir Foto?</h4>
+                <p class="text-muted mb-0">
+                    Tem certeza que deseja remover esta foto do seu portfólio? <br>
+                    <small>Essa ação não poderá ser desfeita.</small>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                <!-- O href será preenchido via JS -->
+                <a href="#" id="btnConfirmarDeleteFoto" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                    Sim, excluir
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -295,17 +357,29 @@
     document.addEventListener("DOMContentLoaded", function() {
         const inputs = document.querySelectorAll('.custom-input-wrapper input');
         inputs.forEach(input => {
-            input.classList.remove('form-control'); // Remove estilo padrão bootstrap
-            input.classList.add('vip-input');       // Adiciona nosso estilo VIP
+            input.classList.remove('form-control'); 
+            input.classList.add('vip-input');
             
-            // Se for input de arquivo, precisamos de um tratamento leve
             if(input.type === 'file'){
                 input.classList.remove('vip-input');
-                input.classList.add('form-control'); // File input do bootstrap 5 é bonito
+                input.classList.add('form-control');
                 input.style.backgroundColor = '#fbfbfb';
                 input.style.border = '1px solid #eee';
             }
         });
     });
+
+    // Função para abrir o Modal de Exclusão com a URL correta
+    function abrirModalExclusao(urlDestino) {
+        // 1. Pega o botão de confirmação dentro do modal
+        var btnConfirmar = document.getElementById('btnConfirmarDeleteFoto');
+        
+        // 2. Atualiza o href dele com a URL de exclusão específica da foto
+        btnConfirmar.href = urlDestino;
+        
+        // 3. Abre o modal usando Bootstrap
+        var modal = new bootstrap.Modal(document.getElementById('modalConfirmarExclusao'));
+        modal.show();
+    }
 </script>
 {% endblock %}
