@@ -4,7 +4,7 @@
 
 {% block extra_head %}
 <style>
-    /* --- SEU ESTILO ORIGINAL --- */
+    /* --- ESTRUTURA GERAL --- */
     .appointment-wrapper {
         min-height: 80vh;
         display: flex;
@@ -18,7 +18,7 @@
         border: none;
         box-shadow: 0 15px 50px rgba(0,0,0,0.05);
         border-radius: 24px;
-        overflow: hidden;
+        overflow: visible; /* Importante para o dropdown sair do card se precisar */
     }
 
     .form-header {
@@ -33,6 +33,11 @@
         margin-top: 1rem;
     }
 
+    .vip-input-group {
+        margin-bottom: 1.5rem;
+        position: relative; /* Para posicionamento do dropdown */
+    }
+
     .vip-input-group label {
         font-size: 0.8rem;
         text-transform: uppercase;
@@ -43,44 +48,136 @@
         display: block;
     }
 
-    .vip-input-group input,
-    .vip-input-group select, 
-    .vip-input-group textarea {
+    /* Esconde o Select Original do Sistema */
+    .vip-input-group select {
+        display: none; 
+    }
+
+    /* --- CUSTOM SELECT (O NOVO VISUAL) --- */
+    .custom-select-wrapper {
+        position: relative;
+        user-select: none;
+        width: 100%;
+    }
+
+    .custom-select-trigger {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #333;
+        background: #fafafa;
+        border: 1px solid #f0f0f0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .custom-select-trigger:after {
+        content: '';
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #c5a059;
+        border-bottom: 2px solid #c5a059;
+        transform: rotate(45deg) translateY(-2px);
+        transition: transform 0.3s;
+        margin-left: 10px;
+    }
+
+    .custom-select-wrapper.open .custom-select-trigger {
+        border-color: #c5a059;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(197, 160, 89, 0.1);
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .custom-select-wrapper.open .custom-select-trigger:after {
+        transform: rotate(225deg) translateY(2px); /* Seta vira pra cima */
+    }
+
+    /* A Lista Suspensa Bonita */
+    .custom-options {
+        position: absolute;
+        display: block;
+        top: 100%;
+        left: 0;
+        right: 0;
+        border: 1px solid #c5a059;
+        border-top: 0;
+        background: #fff;
+        transition: all 0.3s;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: 100;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .custom-select-wrapper.open .custom-options {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+    }
+
+    .custom-option {
+        position: relative;
+        display: block;
+        padding: 0.8rem 1rem;
+        font-size: 0.95rem;
+        font-weight: 400;
+        color: #555;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-bottom: 1px solid #f9f9f9;
+    }
+
+    .custom-option:last-child {
+        border-bottom: none;
+    }
+
+    .custom-option:hover {
+        background-color: #c5a059;
+        color: #fff;
+        padding-left: 1.5rem; /* Efeitozinho de deslize */
+    }
+
+    .custom-option.selected {
+        font-weight: 600;
+        color: #c5a059;
+        background-color: #fff8e1;
+    }
+    
+    /* Scrollbar fina para a lista */
+    .custom-options::-webkit-scrollbar { width: 6px; }
+    .custom-options::-webkit-scrollbar-thumb { background-color: #e0e0e0; border-radius: 10px; }
+
+    /* --- INPUT DE DATA --- */
+    .vip-input-group input[type="date"] {
         width: 100%;
         padding: 0.8rem 1rem;
         border: 1px solid #f0f0f0;
         background-color: #fafafa;
         border-radius: 12px;
         font-size: 1rem;
-        color: #333;
+        color: #555;
         transition: all 0.3s ease;
     }
-
-    .vip-input-group input:focus,
-    .vip-input-group select:focus,
-    .vip-input-group textarea:focus {
+    .vip-input-group input[type="date"]:focus {
         background-color: #fff;
         border-color: #c5a059;
         box-shadow: 0 4px 15px rgba(197, 160, 89, 0.1);
         outline: none;
     }
 
-    input[type="date"], input[type="datetime-local"] {
-        color: #555;
-    }
-
-    .btn-cancel {
-        color: #999;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: color 0.3s;
-    }
-    .btn-cancel:hover {
-        color: #333;
-    }
-
-    /* --- NOVOS ESTILOS (Para os botões de horário) --- */
-    /* Mantendo a identidade VIP */
+    /* --- BOTÕES DE HORÁRIO --- */
     .time-slot-btn {
         border: 1px solid #e0e0e0;
         color: #555;
@@ -92,7 +189,7 @@
         transition: all 0.2s;
         font-weight: 500;
         font-size: 0.9rem;
-        flex: 1 0 20%; /* Grid flexível */
+        flex: 1 0 20%; 
         text-align: center;
         min-width: 80px;
     }
@@ -110,11 +207,8 @@
         box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3);
     }
 
-    .loading-slots {
-        color: #999;
-        font-style: italic;
-        font-size: 0.9rem;
-    }
+    .btn-cancel { color: #999; text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+    .btn-cancel:hover { color: #333; }
 </style>
 {% endblock %}
 
@@ -135,32 +229,30 @@
             <div class="card-body p-0">
                 <form method="post" id="formAgendamento">
                     {% csrf_token %}
-                    
-                    <!-- Campo Oculto (Django vai ler este campo no final) -->
                     {{ form.data_hora_inicio }}
 
                     <!-- 1. Profissional -->
-                    <div class="mb-4 vip-input-group">
+                    <div class="vip-input-group">
                         <label>Profissional</label>
-                        {{ form.profissional }}
+                        {{ form.profissional }} <!-- O JS vai esconder esse e criar o bonito -->
                         {% if form.profissional.errors %}
                             <div class="text-danger small mt-1">{{ form.profissional.errors }}</div>
                         {% endif %}
                     </div>
 
                     <!-- 2. Serviço -->
-                    <div class="mb-4 vip-input-group">
+                    <div class="vip-input-group" id="group-servico">
                         <label>Serviço</label>
-                        {{ form.servico }}
+                        {{ form.servico }} <!-- O JS vai esconder esse e criar o bonito -->
                     </div>
 
-                    <!-- 3. Data (Input Manual HTML) -->
-                    <div class="mb-4 vip-input-group">
+                    <!-- 3. Data -->
+                    <div class="vip-input-group">
                         <label>Data do Corte</label>
                         <input type="date" id="inputData" min="{{ today|date:'Y-m-d' }}">
                     </div>
 
-                    <!-- 4. Container de Horários (Gerado via JS) -->
+                    <!-- 4. Horários -->
                     <div class="mb-4">
                         <label class="d-block text-uppercase fw-bold text-muted mb-2" style="font-size: 0.8rem; letter-spacing: 1px; color: #c5a059;">Horários Disponíveis</label>
                         
@@ -173,7 +265,6 @@
                     </div>
 
                     <div class="d-grid gap-3 mt-5">
-                        <!-- Botão começa desativado até escolher horário -->
                         <button type="submit" id="btnConfirmar" class="btn btn-vip btn-lg rounded-pill py-3 shadow-sm" disabled>
                             Confirmar Agendamento
                         </button>
@@ -195,69 +286,143 @@
 {% block extra_scripts %}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // --- 1. Definição de Variáveis ---
-        const selectProfissional = document.getElementById('select-profissional'); 
-        const selectServico = document.getElementById('id_servico'); // <--- AGORA ELE EXISTE
+        const selectProfissional = document.getElementById('id_profissional') || document.querySelector('select[name="profissional"]'); 
+        const selectServico = document.getElementById('id_servico') || document.querySelector('select[name="servico"]');
         const inputData = document.getElementById('inputData');
         const containerHorarios = document.getElementById('containerHorarios');
-        const inputHiddenDjango = document.getElementById('id_data_hora_inicio'); 
+        const inputHiddenDjango = document.getElementById('id_data_hora_inicio') || document.querySelector('input[name="data_hora_inicio"]');
         const btnConfirmar = document.getElementById('btnConfirmar');
         const avisoErro = document.getElementById('avisoErro');
 
-        // --- 2. Estilização dos Inputs ---
-        const inputs = document.querySelectorAll('.vip-input-group input, .vip-input-group select, .vip-input-group textarea');
-        inputs.forEach(input => {
-            input.classList.remove('form-control'); 
-            input.style.width = "100%";
+        // --- FUNÇÃO MÁGICA: CRIA O SELECT CUSTOMIZADO ---
+        function createCustomSelect(realSelect) {
+            // Remove selects customizados antigos se existirem (para o caso de reload)
+            const parent = realSelect.parentNode;
+            const existingWrapper = parent.querySelector('.custom-select-wrapper');
+            if(existingWrapper) existingWrapper.remove();
+
+            // Esconde o original
+            realSelect.style.display = 'none';
+
+            // Cria a estrutura visual
+            const wrapper = document.createElement('div');
+            wrapper.className = 'custom-select-wrapper';
+            
+            const trigger = document.createElement('div');
+            trigger.className = 'custom-select-trigger';
+            
+            // Texto inicial: Pega o texto e substitui os traços se existirem
+            const selectedOption = realSelect.options[realSelect.selectedIndex];
+            let labelText = selectedOption ? selectedOption.text : 'Selecione...';
+            if(labelText.includes('----')) labelText = 'Selecione...'; // <--- AQUI ESTÁ A CORREÇÃO
+            
+            trigger.innerHTML = `<span>${labelText}</span>`;
+            
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'custom-options';
+
+            // Preenche as opções
+            for (const option of realSelect.options) {
+                // Pula a opção vazia/traços na LISTA para não ficar feio
+                if (option.value === "" || option.text.includes('----')) continue;
+
+                const opt = document.createElement('span');
+                opt.className = 'custom-option ' + (option.selected ? 'selected' : '');
+                opt.textContent = option.text;
+                opt.setAttribute('data-value', option.value);
+                
+                opt.addEventListener('click', function() {
+                    // Atualiza visual
+                    trigger.querySelector('span').textContent = this.textContent;
+                    wrapper.classList.remove('open');
+                    
+                    // Atualiza Select Real
+                    realSelect.value = this.getAttribute('data-value');
+                    realSelect.dispatchEvent(new Event('change')); 
+                    
+                    // Atualiza classes visualmente
+                    optionsDiv.querySelectorAll('.custom-option').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+                
+                optionsDiv.appendChild(opt);
+            }
+
+            // Toggle Open/Close
+            trigger.addEventListener('click', function(e) {
+                // Fecha outros abertos
+                document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                    if(w !== wrapper) w.classList.remove('open');
+                });
+                wrapper.classList.toggle('open');
+                e.stopPropagation();
+            });
+
+            wrapper.appendChild(trigger);
+            wrapper.appendChild(optionsDiv);
+            parent.appendChild(wrapper);
+        }
+
+        // Fecha selects se clicar fora
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.custom-select-wrapper')) {
+                document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+            }
         });
 
-        // --- 3. Lógica: Carregar Serviços do Profissional ---
+        // --- INICIALIZAÇÃO ---
+        if(selectProfissional) createCustomSelect(selectProfissional);
+        if(selectServico) createCustomSelect(selectServico);
+
+        // --- LÓGICA DE DADOS ---
         if (selectProfissional) {
             selectProfissional.addEventListener('change', function() {
                 const profId = this.value;
                 
-                // Limpa o select de serviços
-                selectServico.innerHTML = '<option value="">Carregando...</option>';
-                containerHorarios.innerHTML = ''; // Limpa horários antigos
+                containerHorarios.innerHTML = '';
+                btnConfirmar.disabled = true;
                 
+                selectServico.innerHTML = '<option value="">Carregando...</option>';
+                // Recria o custom select para mostrar "Carregando..."
+                createCustomSelect(selectServico);
+
                 if (!profId) return;
 
                 fetch(`/agendamento/api/servicos/${profId}/`)
                     .then(res => res.json())
                     .then(data => {
+                        // Adiciona a opção padrão
                         let html = '<option value="">Selecione um serviço</option>';
                         data.servicos.forEach(s => {
                             html += `<option value="${s.id}">${s.nome} (${s.duracao_minutos} min) - R$ ${s.preco}</option>`;
                         });
                         selectServico.innerHTML = html;
+                        
+                        // Recria o Custom Select com os novos dados
+                        createCustomSelect(selectServico);
                     });
             });
         }
 
-        // --- 4. Lógica: Buscar Horários Disponíveis ---
         function carregarHorarios() {
             const profId = selectProfissional.value;
-            const servId = selectServico.value; // Pega o valor do serviço
+            const servId = selectServico.value;
             const dataVal = inputData.value;
 
-            // Reset visual
             containerHorarios.innerHTML = '';
             avisoErro.textContent = '';
             btnConfirmar.disabled = true;
-            inputHiddenDjango.value = '';
+            if(inputHiddenDjango) inputHiddenDjango.value = '';
 
-            // VALIDAÇÃO CRUCIAL: Só busca se tiver os 3 dados
             if (!profId || !dataVal || !servId) {
                 if(profId && dataVal && !servId) {
-                    avisoErro.innerHTML = '<span class="text-warning"><i class="fas fa-exclamation-circle"></i> Selecione um serviço para calcular a duração.</span>';
+                    avisoErro.innerHTML = '<span class="text-warning"><i class="fas fa-exclamation-circle"></i> Selecione um serviço.</span>';
                 }
                 return;
             }
 
-            // Mostra loading
             containerHorarios.innerHTML = '<span class="loading-slots"><i class="fas fa-spinner fa-spin me-2"></i>Verificando disponibilidade...</span>';
 
-            // Chama API enviando o servico_id
             const url = `/agendamento/api/horarios-disponiveis/?profissional_id=${profId}&data=${dataVal}&servico_id=${servId}`;
             
             fetch(url)
@@ -275,7 +440,6 @@
                         return;
                     }
 
-                    // Cria os botões de horário
                     data.horarios.forEach(hora => {
                         const btn = document.createElement('div');
                         btn.className = 'time-slot-btn';
@@ -284,7 +448,7 @@
                         btn.onclick = function() {
                             document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('selected'));
                             btn.classList.add('selected');
-                            inputHiddenDjango.value = `${dataVal} ${hora}`;
+                            if(inputHiddenDjango) inputHiddenDjango.value = `${dataVal} ${hora}`;
                             btnConfirmar.disabled = false;
                         };
 
@@ -297,12 +461,10 @@
                 });
         }
 
-        // Adiciona os ouvintes de evento para recalcular quando mudar qualquer coisa
         if(selectProfissional) selectProfissional.addEventListener('change', carregarHorarios);
         if(inputData) inputData.addEventListener('change', carregarHorarios);
-        if(selectServico) selectServico.addEventListener('change', carregarHorarios); // <--- IMPORTANTE
+        if(selectServico) selectServico.addEventListener('change', carregarHorarios);
         
-        // Define data mínima no input date para hoje
         const today = new Date().toISOString().split('T')[0];
         if(inputData) inputData.setAttribute('min', today);
     });
