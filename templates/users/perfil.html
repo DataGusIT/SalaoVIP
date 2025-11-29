@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil | Salão VIP{% endblock %}
+
+{% block extra_head %}
+<style>
+    .profile-wrapper {
+        min-height: 80vh;
+        padding: 3rem 0;
+    }
+
+    /* Card Principal */
+    .card-profile {
+        background: #fff;
+        border: none;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+        border-radius: 24px;
+        overflow: hidden;
+    }
+
+    /* Coluna da Esquerda (Identidade) */
+    .profile-sidebar {
+        background: #fdfdfd;
+        border-right: 1px solid #f0f0f0;
+        padding: 3rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    /* Avatar VIP */
+    .avatar-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .avatar-img {
+        width: 160px;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #fff; /* Borda branca interna */
+        box-shadow: 0 0 0 2px #c5a059, 0 10px 20px rgba(0,0,0,0.1); /* Anel Dourado externo */
+    }
+
+    .avatar-placeholder {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+        color: #c5a059;
+        font-size: 4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 4px solid #fff;
+        box-shadow: 0 0 0 2px #c5a059;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    /* Tipografia Sidebar */
+    .user-handle {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+        font-size: 1.5rem;
+        color: #1a1a1a;
+        margin-bottom: 0.2rem;
+    }
+
+    .user-role {
+        font-size: 0.9rem;
+        color: #999;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+    }
+
+    /* Inputs (Mesmo estilo do Agendamento) */
+    .vip-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #c5a059;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .vip-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background-color: #fbfbfb;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+    .vip-input:focus {
+        background-color: #fff;
+        border-color: #c5a059;
+        outline: none;
+        box-shadow: 0 4px 10px rgba(197, 160, 89, 0.1);
+    }
+    
+    /* Input de arquivo personalizado */
+    input[type="file"] {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    input[type="file"]::file-selector-button {
+        border: none;
+        background: #eee;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        color: #333;
+        cursor: pointer;
+        margin-right: 1rem;
+        transition: background 0.3s;
+    }
+    input[type="file"]::file-selector-button:hover {
+        background: #e0e0e0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container profile-wrapper">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <div class="card-profile">
+                <div class="row g-0">
+                    
+                    <div class="col-md-4 profile-sidebar">
+                        <div class="avatar-container">
+                            {% if user.foto %}
+                                <img src="{{ user.foto.url }}" class="avatar-img" alt="Foto de perfil">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <h2 class="user-handle">@{{ user.username }}</h2>
+                        
+                        {% if user.get_tipo_display %}
+                            <p class="user-role">{{ user.get_tipo_display }}</p>
+                        {% else %}
+                            <p class="user-role">Membro VIP</p>
+                        {% endif %}
+
+                        <div class="mt-4 pt-4 border-top w-100">
+                            <small class="text-muted d-block mb-2">Status da Conta</small>
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
+                                <i class="fas fa-check-circle me-1"></i> Ativa
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8 p-4 p-md-5">
+                        <div class="d-flex justify-content-between align-items-center mb-5">
+                            <h3 style="font-family: 'Outfit', sans-serif; font-weight: 600;">Dados Pessoais</h3>
+                        </div>
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label class="vip-label">Nome</label>
+                                    <div class="custom-input-wrapper">
+                                        {{ form.first_name }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="vip-label">Sobrenome</label>
+                                    <div class="custom-input-wrapper">
+                                        {{ form.last_name }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="vip-label">E-mail de Contato</label>
+                                <div class="custom-input-wrapper">
+                                    {{ form.email }}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="vip-label">Telefone / WhatsApp</label>
+                                <div class="custom-input-wrapper">
+                                    {{ form.telefone }}
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <label class="vip-label">Atualizar Foto</label>
+                                <div class="custom-input-wrapper">
+                                    {{ form.foto }}
+                                </div>
+                                <small class="text-muted mt-1 d-block" style="font-size: 0.75rem;">Recomendado: Imagem quadrada (JPG ou PNG)</small>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-3 align-items-center">
+                                <a href="{% url 'home' %}" class="text-muted text-decoration-none small">Cancelar</a>
+                                <button type="submit" class="btn btn-vip rounded-pill px-5 py-2 shadow-sm">
+                                    Salvar Alterações
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // JS para aplicar as classes VIP nos inputs gerados pelo Django
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll('.custom-input-wrapper input');
+        inputs.forEach(input => {
+            input.classList.remove('form-control'); // Remove estilo padrão bootstrap
+            input.classList.add('vip-input');       // Adiciona nosso estilo VIP
+            
+            // Se for input de arquivo, precisamos de um tratamento leve
+            if(input.type === 'file'){
+                input.classList.remove('vip-input');
+                input.classList.add('form-control'); // File input do bootstrap 5 é bonito
+                input.style.backgroundColor = '#fbfbfb';
+                input.style.border = '1px solid #eee';
+            }
+        });
+    });
+</script>
+{% endblock %}

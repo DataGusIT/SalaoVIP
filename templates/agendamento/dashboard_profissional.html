@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block title %}Painel do Profissional | Salão VIP{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Wrapper do Painel */
+    .dashboard-wrapper {
+        padding: 2rem 0;
+        min-height: 85vh;
+    }
+
+    /* Cards de Estatísticas (KPIs) */
+    .stat-card {
+        background: #fff;
+        border: none;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        transition: transform 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Barra lateral dourada decorativa no card */
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 20%;
+        bottom: 20%;
+        width: 4px;
+        background-color: #c5a059;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .stat-label {
+        color: #999;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .stat-icon {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 2.5rem;
+        color: rgba(197, 160, 89, 0.1); /* Dourado muito suave */
+    }
+
+    /* Tabela da Agenda */
+    .card-agenda {
+        background: #fff;
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.04);
+        overflow: hidden;
+    }
+
+    .agenda-time {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #1a1a1a;
+    }
+
+    /* Avatar do Cliente */
+    .client-avatar {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .client-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        color: #c5a059;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    /* Botões de Ação Circulares */
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: all 0.2s;
+        margin: 0 3px;
+        text-decoration: none;
+    }
+
+    .btn-action-success { background: rgba(25, 135, 84, 0.1); color: #198754; }
+    .btn-action-success:hover { background: #198754; color: #fff; }
+
+    .btn-action-warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+    .btn-action-warning:hover { background: #ffc107; color: #fff; }
+
+    .btn-action-danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    .btn-action-danger:hover { background: #dc3545; color: #fff; }
+
+    /* Acordeão Limpo */
+    .accordion-clean .accordion-item {
+        border: none;
+        background: transparent;
+    }
+    .accordion-clean .accordion-button {
+        background: #fff;
+        border: none;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+        border-radius: 15px !important;
+        font-weight: 600;
+        color: #333;
+    }
+    .accordion-clean .accordion-button:not(.collapsed) {
+        color: #c5a059;
+        background-color: #fff;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    .accordion-clean .accordion-body {
+        background: #fff;
+        border-radius: 0 0 15px 15px;
+        margin-top: 5px;
+        padding: 1rem;
+    }
+
+    /* Badges Soft */
+    .badge-soft { padding: 0.5em 1em; border-radius: 50px; font-weight: 500; font-size: 0.75rem; }
+    .bg-soft-success { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+    .bg-soft-warning { background-color: rgba(255, 193, 7, 0.1); color: #b88a00; }
+    .bg-soft-danger { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    
+    /* Hover helper */
+    .hover-bg-light:hover { background-color: #f8f9fa; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper container">
+    
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-end mb-5">
+        <div>
+            <h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Olá, {{ user.first_name|default:user.username }}</h2>
+            <p class="text-muted mb-0">Aqui está o resumo do seu dia.</p>
+        </div>
+        <div class="text-end d-none d-md-block">
+            <span class="text-uppercase text-secondary small fw-bold" style="letter-spacing: 1px;">Hoje</span>
+            <div class="fs-5 fw-bold text-dark">{{ today|date:"l, d/m/Y" }}</div>
+        </div>
+    </div>
+
+    <!-- Cards KPI -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <i class="fas fa-coins stat-icon"></i>
+                <div class="stat-label">Faturamento (Mês)</div>
+                <div class="stat-value text-success">R$ {{ faturamento|floatformat:2 }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <i class="fas fa-cut stat-icon"></i>
+                <div class="stat-label">Atendimentos Hoje</div>
+                <div class="stat-value">{{ atendimentos_hoje }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <i class="far fa-calendar-check stat-icon"></i>
+                <div class="stat-label">Na Agenda</div>
+                <div class="stat-value">{{ agenda_hoje.count }} <small class="fs-6 fw-normal text-muted">clientes</small></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela Principal -->
+    <div class="card card-agenda mb-5">
+        <div class="card-header bg-white py-4 px-4 border-bottom border-light">
+            <div class="d-flex align-items-center">
+                <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                    <i class="fas fa-clock text-warning"></i>
+                </div>
+                <h5 class="mb-0 fw-bold" style="font-family: 'Outfit', sans-serif;">Agenda de Hoje</h5>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-muted text-uppercase small border-0">Horário</th>
+                        <th class="py-3 text-muted text-uppercase small border-0">Cliente</th>
+                        <th class="py-3 text-muted text-uppercase small border-0">Serviço</th>
+                        <th class="py-3 text-muted text-uppercase small border-0">Valor</th>
+                        <th class="py-3 text-muted text-uppercase small border-0 text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in agenda_hoje %}
+                    <tr style="border-bottom: 1px solid #f9f9f9;">
+                        <!-- Horário -->
+                        <td class="ps-4">
+                            <span class="agenda-time">{{ item.data_hora_inicio|date:"H:i" }}</span>
+                        </td>
+                        
+                        <!-- Cliente (Foto + Nome + Telefone) -->
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if item.cliente.foto %}
+                                    <img src="{{ item.cliente.foto.url }}" class="client-avatar me-3">
+                                {% else %}
+                                    <div class="client-avatar-placeholder me-3">
+                                        {{ item.cliente.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <div class="fw-bold text-dark">
+                                        {% if item.cliente.first_name %}
+                                            {{ item.cliente.first_name }} {{ item.cliente.last_name }}
+                                        {% else %}
+                                            {{ item.cliente.username }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="small text-muted">
+                                        <i class="fab fa-whatsapp me-1 text-success"></i>
+                                        {{ item.cliente.telefone|default:"Sem telefone" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <!-- Serviço -->
+                        <td>
+                            <span class="badge bg-light text-dark fw-normal px-3 py-2 rounded-pill border">
+                                {{ item.servico.nome }}
+                            </span>
+                        </td>
+                        
+                        <!-- Valor -->
+                        <td class="fw-medium text-dark">
+                            R$ {{ item.servico.preco }}
+                        </td>
+                        
+                        <!-- Ações -->
+                        <td class="text-end pe-4">
+                            {% if item.status == 'AGENDADO' %}
+                                <a href="{% url 'mudar_status' item.id 'CONCLUIDO' %}" class="btn-action btn-action-success" data-bs-toggle="tooltip" title="Concluir Atendimento">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <a href="{% url 'mudar_status' item.id 'NAO_COMPARECEU' %}" class="btn-action btn-action-warning" data-bs-toggle="tooltip" title="Cliente Faltou">
+                                    <i class="fas fa-eye-slash"></i>
+                                </a>
+                                <a href="{% url 'mudar_status' item.id 'CANCELADO' %}" class="btn-action btn-action-danger" data-bs-toggle="tooltip" title="Cancelar Agendamento">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            {% else %}
+                                <span class="badge badge-soft 
+                                    {% if item.status == 'CONCLUIDO' %}bg-soft-success
+                                    {% elif item.status == 'NAO_COMPARECEU' %}bg-soft-warning
+                                    {% else %}bg-soft-danger{% endif %}">
+                                    {{ item.get_status_display }}
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="text-muted opacity-50 mb-2"><i class="fas fa-coffee fa-3x"></i></div>
+                            <p class="text-muted">Nenhum agendamento para hoje.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Próximos Agendamentos -->
+    <div class="accordion accordion-clean mb-5" id="accordionFuture">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFuture">
+                    <i class="far fa-calendar-alt me-2"></i> Visualizar Próximos Agendamentos
+                </button>
+            </h2>
+            <div id="collapseFuture" class="accordion-collapse collapse" data-bs-parent="#accordionFuture">
+                <div class="accordion-body px-0">
+                    <div class="list-group list-group-flush rounded-3">
+                        {% for item in agenda_futura %}
+                        <div class="list-group-item border-0 d-flex justify-content-between align-items-center py-3 px-4 hover-bg-light">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded p-2 text-center me-3" style="min-width: 50px;">
+                                    <div class="small fw-bold text-uppercase text-muted">{{ item.data_hora_inicio|date:"M" }}</div>
+                                    <div class="h5 mb-0 fw-bold text-dark">{{ item.data_hora_inicio|date:"d" }}</div>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">
+                                        {% if item.cliente.first_name %}
+                                            {{ item.cliente.first_name }} {{ item.cliente.last_name }}
+                                        {% else %}
+                                            {{ item.cliente.username }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="small text-muted">{{ item.servico.nome }} • {{ item.data_hora_inicio|date:"H:i" }}</div>
+                                </div>
+                            </div>
+                            <span class="badge bg-light text-secondary">Futuro</span>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-3 text-muted small">Nenhum agendamento futuro encontrado.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Inicializar Tooltips do Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+{% endblock %}

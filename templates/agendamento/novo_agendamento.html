@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Novo Agendamento | Salão VIP{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Wrapper para centralizar e dar respiro */
+    .appointment-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+
+    .card-clean {
+        background: #fff;
+        border: none;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.05); /* Sombra difusa premium */
+        border-radius: 24px;
+        overflow: hidden;
+    }
+
+    /* Cabeçalho interno sutil */
+    .form-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    
+    .form-header h4 {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-top: 1rem;
+    }
+
+    /* Estilo dos Inputs (Consistente com Registro) */
+    .vip-input-group label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        color: #c5a059; /* Label Dourado */
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .vip-input-group input,
+    .vip-input-group select, 
+    .vip-input-group textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1px solid #f0f0f0;
+        background-color: #fafafa;
+        border-radius: 12px;
+        font-size: 1rem;
+        color: #333;
+        transition: all 0.3s ease;
+    }
+
+    .vip-input-group input:focus,
+    .vip-input-group select:focus,
+    .vip-input-group textarea:focus {
+        background-color: #fff;
+        border-color: #c5a059;
+        box-shadow: 0 4px 15px rgba(197, 160, 89, 0.1);
+        outline: none;
+    }
+
+    /* Ajuste específico para input de data/hora se houver */
+    input[type="date"], input[type="datetime-local"] {
+        color: #555;
+    }
+
+    /* Link de cancelar discreto */
+    .btn-cancel {
+        color: #999;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s;
+    }
+    .btn-cancel:hover {
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="appointment-wrapper">
+    <div class="col-11 col-md-8 col-lg-6">
+        
+        <div class="card card-clean p-4 p-md-5">
+            
+            <div class="form-header">
+                <span class="badge bg-light text-dark rounded-pill px-3 py-2 mb-2">
+                    <i class="fas fa-calendar-alt text-warning me-1"></i> Reserva Online
+                </span>
+                <h4>Agendar Experiência</h4>
+                <p class="text-muted small">Escolha o serviço e o melhor horário para você</p>
+            </div>
+
+            <div class="card-body p-0">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-4 vip-input-group">
+                        <label>{{ field.label }}</label>
+                        
+                        {{ field }}
+                        
+                        {% if field.help_text %}
+                            <small class="d-block mt-1 text-muted" style="font-size: 0.75rem;">
+                                <i class="fas fa-info-circle me-1"></i>{{ field.help_text }}
+                            </small>
+                        {% endif %}
+                        
+                        {% for error in field.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fas fa-exclamation-triangle me-1"></i>{{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="d-grid gap-3 mt-5">
+                        <button type="submit" class="btn btn-vip btn-lg rounded-pill py-3 shadow-sm">
+                            Confirmar Agendamento
+                        </button>
+                        
+                        <div class="text-center">
+                            <a href="{% url 'home' %}" class="btn-cancel">
+                                Cancelar e voltar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Garante que os campos do Django (Select, Input) peguem o estilo correto
+    // mesmo que o Django tente renderizar classes padrões.
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll('.vip-input-group input, .vip-input-group select, .vip-input-group textarea');
+        inputs.forEach(input => {
+            // Remove bordas padrões do bootstrap se existirem
+            input.classList.remove('form-control'); 
+            input.style.width = "100%"; // Força largura total
+        });
+    });
+</script>
+{% endblock %}

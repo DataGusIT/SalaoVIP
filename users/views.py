@@ -1,0 +1,54 @@
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import logout
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
+from .forms import ClienteRegistroForm, PerfilForm
+
+def home(request):
+    return render(request, 'home.html')
+
+def registro(request):
+    if request.method == 'POST':
+        form = ClienteRegistroForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Conta criada com sucesso! Faça login.')
+            return redirect('login')
+    else:
+        form = ClienteRegistroForm()
+    return render(request, 'users/registro.html', {'form': form})
+
+@login_required
+def editar_perfil(request):
+    if request.method == 'POST':
+        # instance=request.user carrega os dados atuais do usuário no formulário
+        form = PerfilForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('editar_perfil')
+    else:
+        form = PerfilForm(instance=request.user)
+    
+    return render(request, 'users/perfil.html', {'form': form})
+
+# 1. VIEW DE LOGIN CUSTOMIZADA (Para mandar Toasts)
+class CustomLoginView(LoginView):
+    template_name = 'users/login.html'
+
+    def form_valid(self, form):
+        # Mensagem de Sucesso ao logar
+        messages.success(self.request, f"Bem-vindo(a) de volta, {self.request.user.first_name or self.request.user.username}!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Mensagem de Erro ao errar a senha
+        messages.error(self.request, "Usuário ou senha incorretos. Tente novamente.")
+        return super().form_invalid(form)
+
+# 2. VIEW DE LOGOUT CUSTOMIZADA
+def custom_logout(request):
+    logout(request)
+    messages.info(request, "Você saiu do sistema. Até logo!") # Toast de despedida
+    return redirect('home')

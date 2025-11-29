@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Agendamentos | Salão VIP{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Wrapper geral */
+    .schedule-wrapper {
+        min-height: 80vh;
+        padding: 2rem 0;
+    }
+
+    /* Card da Tabela */
+    .card-clean {
+        background: #fff;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+        border-radius: 20px;
+        overflow: hidden; /* Para os cantos da tabela respeitarem o card */
+    }
+
+    /* Cabeçalho do Card */
+    .card-header-clean {
+        padding: 2rem 2rem 1rem 2rem;
+        background: #fff;
+        border-bottom: 1px solid #f5f5f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    /* Estilização da Tabela */
+    .table-vip {
+        width: 100%;
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .table-vip thead th {
+        border-bottom: 1px solid #eee;
+        background-color: #fbfbfb;
+        color: #999;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        padding: 1.2rem 1.5rem;
+        border-top: none;
+    }
+
+    .table-vip tbody td {
+        padding: 1.2rem 1.5rem;
+        border-bottom: 1px solid #f9f9f9;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .table-vip tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-vip tbody tr {
+        transition: background-color 0.2s;
+    }
+
+    .table-vip tbody tr:hover {
+        background-color: #fafafa;
+    }
+
+    /* Badges de Status Personalizados (Estilo "Pill" Suave) */
+    .badge-soft {
+        padding: 0.5em 1em;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* Cores dos status */
+    .status-agendado {
+        background-color: rgba(197, 160, 89, 0.1); /* Dourado bem claro */
+        color: #b08d45;
+    }
+    
+    .status-concluido {
+        background-color: rgba(25, 135, 84, 0.1); /* Verde claro */
+        color: #198754;
+    }
+    
+    .status-cancelado {
+        background-color: rgba(220, 53, 69, 0.08); /* Vermelho claro */
+        color: #dc3545;
+        text-decoration: line-through; /* Detalhe sutil */
+    }
+
+    /* Estado Vazio */
+    .empty-state {
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+    .empty-icon {
+        font-size: 3rem;
+        color: #eee;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container schedule-wrapper">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            
+            <div class="card card-clean">
+                
+                <div class="card-header-clean">
+                    <div>
+                        <h4 class="page-title">Histórico de Visitas</h4>
+                        <p class="text-muted small mb-0">Gerencie seus próximos horários</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'novo_agendamento' %}" class="btn btn-vip btn-sm rounded-pill px-3">
+                            <i class="fas fa-plus me-1"></i> Novo
+                        </a>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-vip mb-0">
+                        <thead>
+                            <tr>
+                                <th>Serviço</th>
+                                <th>Profissional</th>
+                                <th>Data e Hora</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for agenda in agendamentos %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">{{ agenda.servico.nome }}</div>
+                                    <small class="text-muted">Duração padrão</small>
+                                </td>
+                                
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; color: #aaa;">
+                                            <i class="fas fa-user-tie"></i>
+                                        </div>
+                                        <span>{{ agenda.profissional.username }}</span>
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    <i class="far fa-calendar me-2 text-muted"></i>{{ agenda.data_hora_inicio|date:"d M, Y" }}
+                                    <br>
+                                    <small class="text-muted ms-4">
+                                        {{ agenda.data_hora_inicio|date:"H:i" }} - {{ agenda.data_hora_fim|date:"H:i" }}
+                                    </small>
+                                </td>
+                                
+                                <td class="text-center">
+                                    {% if agenda.status == 'AGENDADO' %}
+                                        <span class="badge badge-soft status-agendado">
+                                            <i class="fas fa-clock me-1"></i> Agendado
+                                        </span>
+                                    {% elif agenda.status == 'CONCLUIDO' %}
+                                        <span class="badge badge-soft status-concluido">
+                                            Concluído
+                                        </span>
+                                    {% elif agenda.status == 'CANCELADO' %}
+                                        <span class="badge badge-soft status-cancelado">
+                                            Cancelado
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark">
+                                            {{ agenda.get_status_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </div>
+                                        <h5 class="fw-light text-muted">Nenhum agendamento encontrado</h5>
+                                        <p class="small text-muted mb-4">Seu histórico está vazio. Que tal marcar algo novo?</p>
+                                        <a href="{% url 'novo_agendamento' %}" class="btn btn-outline-vip rounded-pill">
+                                            Agendar Primeiro Horário
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

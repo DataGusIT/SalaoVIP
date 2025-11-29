@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Salão VIP{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter + Outfit) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Paleta de Cores Elegante */
+            --primary-dark: #1a1a1a;
+            --vip-gold: #c5a059; /* Tom dourado sóbrio */
+            --vip-gold-hover: #b08d45;
+            --bg-light: #f8f9fa;
+            --text-grey: #6c757d;
+        }
+
+        body { 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--primary-dark);
+        }
+
+        /* Tipografia de Títulos */
+        h1, h2, h3, h4, h5, h6, .navbar-brand {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Navbar Clean e Moderna */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            color: var(--primary-dark) !important;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .navbar-brand i {
+            color: var(--vip-gold);
+        }
+
+        .nav-link {
+            color: var(--primary-dark) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--vip-gold) !important;
+        }
+
+        /* Botões Personalizados */
+        .btn-vip {
+            background-color: var(--primary-dark);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px; /* Redondo moderno */
+            transition: all 0.3s ease;
+        }
+
+        .btn-vip:hover {
+            background-color: var(--vip-gold);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3);
+        }
+
+        .btn-outline-vip {
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+            padding: 0.4rem 1.4rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .btn-outline-vip:hover {
+            background-color: var(--primary-dark);
+            color: #fff;
+        }
+
+        /* Footer Minimalista */
+        footer { 
+            background-color: #fff; 
+            color: var(--text-grey); 
+            padding: 40px 0; 
+            margin-top: auto; 
+            border-top: 1px solid #eee;
+        }
+        
+        /* Dropdown Clean */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 12px;
+        }
+        
+        .dropdown-item {
+            padding: 0.7rem 1.5rem;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--bg-light);
+            color: var(--vip-gold);
+        }
+
+        /* Animações e Utilitários */
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        main { flex: 1; padding-top: 20px; }
+
+        /* --- ESTILOS DOS TOASTS (NOTIFICAÇÕES) --- */
+        .toast-container {
+            z-index: 1060; /* Acima de tudo */
+        }
+        
+        .toast-vip {
+            background-color: #fff;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        /* Faixa lateral colorida baseada no tipo */
+        .toast-vip.success { border-left: 5px solid #198754; }
+        .toast-vip.error { border-left: 5px solid #dc3545; }
+        .toast-vip.warning { border-left: 5px solid #ffc107; }
+        .toast-vip.info { border-left: 5px solid #0dcaf0; }
+
+        .toast-header {
+            background-color: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            color: #1a1a1a;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+        
+        .toast-body {
+            font-size: 0.95rem;
+            color: #555;
+            background: #fff;
+        }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-scissors me-2"></i>Salão VIP
+            </a>
+            
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="fas fa-bars text-dark"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Início</a>
+                    </li>
+                    
+                    {% if user.is_authenticated %}
+                        
+                        <!-- LÓGICA DE EXIBIÇÃO POR TIPO DE USUÁRIO -->
+                        {% if user.tipo == 'CABELEIREIRO' %}
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold text-dark" href="{% url 'listar_agendamentos' %}">
+                                    <i class="fas fa-calendar-alt me-1 text-warning"></i> Minha Agenda
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'novo_agendamento' %}">Agendar</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'listar_agendamentos' %}">Meus Agendamentos</a>
+                            </li>
+                        {% endif %}
+
+                        <!-- DROPDOWN DO USUÁRIO -->
+                        <li class="nav-item dropdown ms-lg-3">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
+                                {% if user.foto %}
+                                    <img src="{{ user.foto.url }}" class="rounded-circle border" style="width: 35px; height: 35px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border" style="width: 35px; height: 35px;">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <span>{{ user.username }}</span>
+                            </a>
+                            
+                            <ul class="dropdown-menu dropdown-menu-end fade-down">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'editar_perfil' %}">
+                                        <i class="fas fa-user-edit me-2"></i>Meu Perfil
+                                    </a>
+                                </li>
+                                {% if user.is_staff %}
+                                <li>
+                                    <a class="dropdown-item" href="/admin/">
+                                        <i class="fas fa-cog me-2"></i>Painel Admin
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Sair
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                         <li class="nav-item ms-lg-3">
+                            <a class="nav-link fw-bold" href="{% url 'login' %}">Entrar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-vip ms-2" href="{% url 'registro' %}">Criar Conta</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SISTEMA DE TOASTS (NOTIFICAÇÕES FLUTUANTES) -->
+    <!-- Substitui o antigo container de alertas estáticos -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast toast-vip {{ message.tags }}" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong class="me-auto">Sucesso</strong>
+                        {% elif message.tags == 'error' %}
+                            <i class="fas fa-exclamation-circle text-danger me-2"></i>
+                            <strong class="me-auto">Atenção</strong>
+                        {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                            <strong class="me-auto">Aviso</strong>
+                        {% else %}
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            <strong class="me-auto">Informação</strong>
+                        {% endif %}
+                        <small class="text-muted">agora</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="container mb-5">
+        <div class="fade-in">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center">
+        <div class="container">
+            <div class="mb-3">
+                <i class="fas fa-cut" style="color: var(--vip-gold); font-size: 1.2rem;"></i>
+            </div>
+            <p class="mb-1 fw-medium">&copy; 2025 Salão VIP System</p>
+            <small style="opacity: 0.6;">Excelência em cada detalhe</small>
+        </div>
+    </footer>
+
+    <!-- Scripts do Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts Globais de Inicialização -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Inicializar TOASTS (Notificações)
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+            var toastList = toastElList.map(function (toastEl) {
+                // Autohide: true (some sozinho), Delay: 5000ms (5 segundos)
+                return new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 }).show()
+            });
+
+            // 2. Inicializar TOOLTIPS (Dicas ao passar o mouse)
+            // Isso habilita tooltips em QUALQUER página que tenha data-bs-toggle="tooltip"
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
