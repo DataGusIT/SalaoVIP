@@ -33,17 +33,20 @@ def editar_perfil(request):
     
     return render(request, 'users/perfil.html', {'form': form})
 
-# 1. VIEW DE LOGIN CUSTOMIZADA (Para mandar Toasts)
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
 
     def form_valid(self, form):
-        # Mensagem de Sucesso ao logar
-        messages.success(self.request, f"Bem-vindo(a) de volta, {self.request.user.first_name or self.request.user.username}!")
+        # CORREÇÃO: Pegamos o usuário do formulário, não da request
+        usuario = form.get_user()
+        
+        # Define o nome para exibir (Primeiro nome ou Username)
+        nome = usuario.first_name if usuario.first_name else usuario.username
+        
+        messages.success(self.request, f"Bem-vindo(a) de volta, {nome}!")
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        # Mensagem de Erro ao errar a senha
         messages.error(self.request, "Usuário ou senha incorretos. Tente novamente.")
         return super().form_invalid(form)
 

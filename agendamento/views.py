@@ -47,15 +47,15 @@ def dashboard_profissional(request):
     if request.user.tipo != 'CABELEIREIRO':
         return redirect('home')
 
-    hoje = timezone.now().date()
+    hoje = timezone.localdate() 
     
-    # 1. Agendamentos de HOJE
+     # 1. Agendamentos de HOJE
     agenda_hoje = Agendamento.objects.filter(
         profissional=request.user,
         data_hora_inicio__date=hoje
     ).order_by('data_hora_inicio')
 
-    # 2. Agendamentos FUTUROS (Amanhã em diante)
+    # 2. Agendamentos FUTUROS
     agenda_futura = Agendamento.objects.filter(
         profissional=request.user,
         data_hora_inicio__date__gt=hoje

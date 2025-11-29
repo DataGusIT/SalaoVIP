@@ -5,18 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Salão VIP{% endblock %}</title>
     
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (Inter + Outfit) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             /* Paleta de Cores Elegante */
             --primary-dark: #1a1a1a;
-            --vip-gold: #c5a059; /* Tom dourado sóbrio */
+            --vip-gold: #c5a059;
             --vip-gold-hover: #b08d45;
             --bg-light: #f8f9fa;
             --text-grey: #6c757d;
@@ -51,9 +48,7 @@
             letter-spacing: -0.5px;
         }
         
-        .navbar-brand i {
-            color: var(--vip-gold);
-        }
+        .navbar-brand i { color: var(--vip-gold); }
 
         .nav-link {
             color: var(--primary-dark) !important;
@@ -63,9 +58,7 @@
             transition: color 0.3s ease;
         }
 
-        .nav-link:hover {
-            color: var(--vip-gold) !important;
-        }
+        .nav-link:hover { color: var(--vip-gold) !important; }
 
         /* Botões Personalizados */
         .btn-vip {
@@ -73,7 +66,7 @@
             color: #fff;
             border: none;
             padding: 0.5rem 1.5rem;
-            border-radius: 50px; /* Redondo moderno */
+            border-radius: 50px;
             transition: all 0.3s ease;
         }
 
@@ -97,7 +90,7 @@
             color: #fff;
         }
 
-        /* Footer Minimalista */
+        /* Footer */
         footer { 
             background-color: #fff; 
             color: var(--text-grey); 
@@ -106,67 +99,123 @@
             border-top: 1px solid #eee;
         }
         
-        /* Dropdown Clean */
+        /* Dropdown */
         .dropdown-menu {
             border: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             border-radius: 12px;
         }
-        
-        .dropdown-item {
-            padding: 0.7rem 1.5rem;
-        }
+        .dropdown-item { padding: 0.7rem 1.5rem; }
+        .dropdown-item:hover { background-color: var(--bg-light); color: var(--vip-gold); }
 
-        .dropdown-item:hover {
-            background-color: var(--bg-light);
-            color: var(--vip-gold);
-        }
-
-        /* Animações e Utilitários */
+        /* Animações */
         .fade-in { animation: fadeIn 0.8s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         main { flex: 1; padding-top: 20px; }
 
-        /* --- ESTILOS DOS TOASTS (NOTIFICAÇÕES) --- */
+        /* --- NOVO ESTILO DOS TOASTS (Minimalista) --- */
         .toast-container {
-            z-index: 1060; /* Acima de tudo */
+            z-index: 9999;
+            padding: 1.5rem;
         }
-        
-        .toast-vip {
-            background-color: #fff;
-            border: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        /* Faixa lateral colorida baseada no tipo */
-        .toast-vip.success { border-left: 5px solid #198754; }
-        .toast-vip.error { border-left: 5px solid #dc3545; }
-        .toast-vip.warning { border-left: 5px solid #ffc107; }
-        .toast-vip.info { border-left: 5px solid #0dcaf0; }
 
-        .toast-header {
-            background-color: #fff;
-            border-bottom: 1px solid #f0f0f0;
-            color: #1a1a1a;
+        .toast-minimal {
+            background: #fff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08); /* Sombra difusa elegante */
+            padding: 0;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            max-width: 380px;
+            position: relative;
+        }
+
+        /* Barra lateral colorida fina */
+        .toast-minimal::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        /* Layout interno flexível */
+        .toast-content {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.2rem;
+        }
+
+        /* Ícone com fundo suave */
+        .toast-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .toast-text {
+            flex-grow: 1;
+            padding-right: 1rem;
+        }
+
+        .toast-title {
             font-family: 'Outfit', sans-serif;
             font-weight: 600;
-        }
-        
-        .toast-body {
             font-size: 0.95rem;
-            color: #555;
-            background: #fff;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+            display: block;
         }
+
+        .toast-msg {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.3;
+        }
+
+        /* Cores Específicas */
+        /* Sucesso */
+        .toast-minimal.success::before { background-color: #198754; }
+        .toast-minimal.success .toast-icon-box { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+        
+        /* Erro */
+        .toast-minimal.error::before { background-color: #dc3545; }
+        .toast-minimal.error .toast-icon-box { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }
+        
+        /* Aviso */
+        .toast-minimal.warning::before { background-color: #ffc107; }
+        .toast-minimal.warning .toast-icon-box { background-color: rgba(255, 193, 7, 0.1); color: #ffc107; }
+        
+        /* Info */
+        .toast-minimal.info::before { background-color: #0dcaf0; }
+        .toast-minimal.info .toast-icon-box { background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
+
+        /* Botão de fechar sutil */
+        .btn-close-custom {
+            background: transparent;
+            border: none;
+            color: #ccc;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.3s;
+        }
+        .btn-close-custom:hover { color: #333; }
     </style>
     
     {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
@@ -185,7 +234,6 @@
                     
                     {% if user.is_authenticated %}
                         
-                        <!-- LÓGICA DE EXIBIÇÃO POR TIPO DE USUÁRIO -->
                         {% if user.tipo == 'CABELEIREIRO' %}
                             <li class="nav-item">
                                 <a class="nav-link fw-bold text-dark" href="{% url 'listar_agendamentos' %}">
@@ -201,7 +249,6 @@
                             </li>
                         {% endif %}
 
-                        <!-- DROPDOWN DO USUÁRIO -->
                         <li class="nav-item dropdown ms-lg-3">
                             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
                                 {% if user.foto %}
@@ -251,38 +298,42 @@
         </div>
     </nav>
 
-    <!-- SISTEMA DE TOASTS (NOTIFICAÇÕES FLUTUANTES) -->
-    <!-- Substitui o antigo container de alertas estáticos -->
-    <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div class="toast-container position-fixed top-0 end-0">
         {% if messages %}
             {% for message in messages %}
-                <div class="toast toast-vip {{ message.tags }}" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header">
-                        {% if message.tags == 'success' %}
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <strong class="me-auto">Sucesso</strong>
-                        {% elif message.tags == 'error' %}
-                            <i class="fas fa-exclamation-circle text-danger me-2"></i>
-                            <strong class="me-auto">Atenção</strong>
-                        {% elif message.tags == 'warning' %}
-                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                            <strong class="me-auto">Aviso</strong>
-                        {% else %}
-                            <i class="fas fa-info-circle text-info me-2"></i>
-                            <strong class="me-auto">Informação</strong>
-                        {% endif %}
-                        <small class="text-muted">agora</small>
-                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body">
-                        {{ message }}
+                <div class="toast toast-minimal {{ message.tags }}" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-content">
+                        <div class="toast-icon-box">
+                            {% if message.tags == 'success' %}
+                                <i class="fas fa-check"></i>
+                            {% elif message.tags == 'error' %}
+                                <i class="fas fa-times"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation"></i>
+                            {% else %}
+                                <i class="fas fa-info"></i>
+                            {% endif %}
+                        </div>
+
+                        <div class="toast-text">
+                            <span class="toast-title">
+                                {% if message.tags == 'success' %}Sucesso
+                                {% elif message.tags == 'error' %}Atenção
+                                {% elif message.tags == 'warning' %}Aviso
+                                {% else %}Informação{% endif %}
+                            </span>
+                            <span class="toast-msg">{{ message }}</span>
+                        </div>
+
+                        <button type="button" class="btn-close-custom" data-bs-dismiss="toast" aria-label="Close">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 </div>
             {% endfor %}
         {% endif %}
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <main class="container mb-5">
         <div class="fade-in">
             {% block content %}
@@ -290,7 +341,6 @@
         </div>
     </main>
 
-    <!-- FOOTER -->
     <footer class="text-center">
         <div class="container">
             <div class="mb-3">
@@ -301,21 +351,18 @@
         </div>
     </footer>
 
-    <!-- Scripts do Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Scripts Globais de Inicialização -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // 1. Inicializar TOASTS (Notificações)
+            // Inicializar TOASTS
             var toastElList = [].slice.call(document.querySelectorAll('.toast'))
             var toastList = toastElList.map(function (toastEl) {
-                // Autohide: true (some sozinho), Delay: 5000ms (5 segundos)
+                // Autohide 5s
                 return new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 }).show()
             });
 
-            // 2. Inicializar TOOLTIPS (Dicas ao passar o mouse)
-            // Isso habilita tooltips em QUALQUER página que tenha data-bs-toggle="tooltip"
+            // Inicializar TOOLTIPS
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
