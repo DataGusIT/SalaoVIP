@@ -59,37 +59,69 @@ def dashboard_profissional(request):
     if request.user.tipo != 'CABELEIREIRO':
         return redirect('home')
 
-    hoje = timezone.localdate() 
+    hoje = timezone.localdate()
+
+    # --- 1. CONFIGURAÇÃO DO FILTRO (DATA INICIO E FIM) ---
+    data_inicio_str = request.GET.get('data_inicio')
+    data_fim_str = request.GET.get('data_fim')
+
+    # Se vierem datas na URL, usa elas. Se não, usa "Hoje" como padrão.
+    if data_inicio_str and data_fim_str:
+        try:
+            data_inicio = datetime.strptime(data_inicio_str, "%Y-%m-%d").date()
+            data_fim = datetime.strptime(data_fim_str, "%Y-%m-%d").date()
+        except ValueError:
+            data_inicio = data_fim = hoje
+    else:
+        data_inicio = data_fim = hoje
+
+    # --- 2. LÓGICA VISUAL DO BOTÃO ATIVO ---
+    filtro_selecionado = 'personalizado'
     
-     # 1. Agendamentos de HOJE
-    agenda_hoje = Agendamento.objects.filter(
+    if data_inicio == hoje and data_fim == hoje:
+        filtro_selecionado = 'hoje'
+    # Verifica se é "Últimos 7 dias" (Hoje - 7 até Hoje)
+    elif data_inicio == (hoje - timedelta(days=7)) and data_fim == hoje:
+        filtro_selecionado = 'semana'
+    # Verifica se é o mês atual (Dia 1 até fim do mês)
+    elif data_inicio.day == 1 and data_fim.day > 27: 
+        filtro_selecionado = 'mes'
+
+    # --- 3. BUSCA NO BANCO DE DADOS (KPIs e TABELA) ---
+    # Busca agendamentos dentro do intervalo selecionado
+    agenda_periodo = Agendamento.objects.filter(
         profissional=request.user,
-        data_hora_inicio__date=hoje
+        data_hora_inicio__date__range=[data_inicio, data_fim]
     ).order_by('data_hora_inicio')
 
-    # 2. Agendamentos FUTUROS
+    # KPI: Faturamento do período (Soma apenas os CONCLUÍDOS)
+    faturamento = agenda_periodo.filter(status='CONCLUIDO').aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
+
+    # KPI: Total de atendimentos concluídos no período
+    atendimentos_periodo = agenda_periodo.filter(status='CONCLUIDO').count()
+    
+    # KPI: Total geral na agenda (agendados + concluídos + cancelados) no período
+    total_agendados = agenda_periodo.count()
+
+    # --- 4. AGENDAMENTOS FUTUROS (ACCORDION) ---
+    # Sempre mostra o que vem pela frente (Amanhã em diante), independente do filtro
     agenda_futura = Agendamento.objects.filter(
         profissional=request.user,
         data_hora_inicio__date__gt=hoje
     ).order_by('data_hora_inicio')
 
-    # 3. Faturamento do Mês (Soma preços de agendamentos CONCLUÍDOS)
-    mes_atual = timezone.now().month
-    faturamento = Agendamento.objects.filter(
-        profissional=request.user,
-        status='CONCLUIDO',
-        data_hora_inicio__month=mes_atual
-    ).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
-
-    # 4. Clientes atendidos hoje (Concluídos)
-    atendimentos_hoje = agenda_hoje.filter(status='CONCLUIDO').count()
-
     context = {
-        'agenda_hoje': agenda_hoje,
-        'agenda_futura': agenda_futura,
+        'agenda_periodo': agenda_periodo, # Nome usado na tabela principal
+        'agenda_futura': agenda_futura,   # Nome usado no accordion
         'faturamento': faturamento,
-        'atendimentos_hoje': atendimentos_hoje,
+        'atendimentos_periodo': atendimentos_periodo,
+        'total_agendados': total_agendados,
         'hoje': hoje,
+        # Dados para manter o filtro preenchido e o botão aceso
+        'data_inicio': data_inicio.strftime('%Y-%m-%d'),
+        'data_fim': data_fim.strftime('%Y-%m-%d'),
+        'filtro_selecionado': filtro_selecionado,
+        'filtro_ativo': data_inicio != hoje or data_fim != hoje
     }
     
     return render(request, 'agendamento/dashboard_profissional.html', context)

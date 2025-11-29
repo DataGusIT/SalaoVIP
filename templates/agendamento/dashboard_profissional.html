@@ -67,6 +67,38 @@
         color: rgba(197, 160, 89, 0.1); /* Dourado muito suave */
     }
 
+    /* Barra de Filtros */
+    .filter-bar {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        margin-bottom: 2rem;
+    }
+    
+    .btn-filter {
+        border: 1px solid #eee;
+        background: #f8f9fa;
+        color: #666;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        transition: all 0.2s;
+    }
+    .btn-filter:hover, .btn-filter.active {
+        background: #c5a059;
+        color: white;
+        border-color: #c5a059;
+    }
+    
+    .date-input {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
     /* Tabela da Agenda */
     .card-agenda {
         background: #fff;
@@ -163,7 +195,7 @@
     /* Hover helper */
     .hover-bg-light:hover { background-color: #f8f9fa; }
 
-     /* Adicione apenas este estilo extra para a lista de histórico */
+     /* Timeline do Histórico */
     .timeline-item {
         border-left: 2px solid #e9ecef;
         padding-left: 20px;
@@ -181,26 +213,7 @@
         top: 5px;
     }
 
-    /* Botão Glass para Configurações */
-    .btn-glass {
-        background: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(0,0,0,0.05);
-        color: #555;
-        backdrop-filter: blur(4px);
-        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-        font-weight: 500;
-        font-size: 0.85rem;
-        transition: all 0.3s ease;
-    }
-    .btn-glass:hover {
-        background: #fff;
-        color: #c5a059; /* Dourado no hover */
-        border-color: #c5a059;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(197, 160, 89, 0.15);
-    }
-
-    /* Adicionei apenas este ajuste para os botões do header ficarem alinhados */
+    /* Ações do Header */
     .header-actions {
         display: flex;
         gap: 10px;
@@ -212,61 +225,90 @@
 <div class="dashboard-wrapper container">
     
     <!-- Cabeçalho -->
-    <div class="d-flex justify-content-between align-items-end mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
         <div>
             <h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Olá, {{ user.first_name|default:user.username }}</h2>
-            <p class="text-muted mb-3">Aqui está o resumo do seu dia.</p>
-            
-            <!-- BOTÕES DE AÇÃO (SERVIÇOS E HORÁRIOS) -->
-            <div class="header-actions">
-                <a href="{% url 'gerenciar_servicos' %}" class="btn btn-vip rounded-pill px-4 py-2 text-white">
-                    <i class="fas fa-cut me-2"></i> Meus Serviços
-                </a>
-                
-                <a href="{% url 'configurar_horarios' %}" class="btn btn-outline-dark rounded-pill px-4 py-2">
-                    <i class="fas fa-clock me-2"></i> Ajustar Horários
-                </a>
-            </div>
+            <p class="text-muted mb-0">Gerencie seus resultados e agenda.</p>
         </div>
-        <div class="text-end d-none d-md-block">
-            <span class="text-uppercase text-secondary small fw-bold" style="letter-spacing: 1px;">Hoje</span>
-            <div class="fs-5 fw-bold text-dark">{{ today|date:"l, d/m/Y" }}</div>
+        
+        <div class="header-actions">
+            <a href="{% url 'gerenciar_servicos' %}" class="btn btn-vip rounded-pill px-4 py-2 text-white btn-sm">
+                <i class="fas fa-cut me-2"></i> Serviços
+            </a>
+            <a href="{% url 'configurar_horarios' %}" class="btn btn-outline-dark rounded-pill px-4 py-2 btn-sm">
+                <i class="fas fa-clock me-2"></i> Horários
+            </a>
         </div>
     </div>
 
-    <!-- Cards KPI -->
+    <!-- BARRA DE FILTROS (KPIs) -->
+    <div class="filter-bar">
+        <form method="get" id="filterForm" class="row g-3 align-items-center">
+            <!-- Botões Rápidos -->
+            <div class="col-md-5 d-flex gap-2">
+                <button type="button" class="btn btn-filter w-100" onclick="aplicarFiltro('hoje')">Hoje</button>
+                <button type="button" class="btn btn-filter w-100" onclick="aplicarFiltro('semana')">Últimos 7 Dias</button>
+                <button type="button" class="btn btn-filter w-100" onclick="aplicarFiltro('mes')">Este Mês</button>
+            </div>
+
+            <!-- Seleção Personalizada -->
+            <div class="col-md-5 d-flex align-items-center gap-2 justify-content-md-end">
+                <label class="small text-muted fw-bold">De:</label>
+                <input type="date" name="data_inicio" id="dataInicio" value="{{ data_inicio }}" class="form-control date-input">
+                
+                <label class="small text-muted fw-bold">Até:</label>
+                <input type="date" name="data_fim" id="dataFim" value="{{ data_fim }}" class="form-control date-input">
+            </div>
+
+            <!-- Botão Filtrar -->
+            <div class="col-md-2 text-end">
+                <button type="submit" class="btn btn-dark rounded-pill w-100">
+                    <i class="fas fa-filter me-1"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- CARDS KPI (DADOS DINÂMICOS) -->
     <div class="row g-4 mb-5">
         <div class="col-md-4">
             <div class="stat-card">
                 <i class="fas fa-coins stat-icon"></i>
-                <div class="stat-label">Faturamento (Mês)</div>
+                <div class="stat-label">
+                    {% if filtro_ativo %}Faturamento (Período){% else %}Faturamento (Hoje){% endif %}
+                </div>
                 <div class="stat-value text-success">R$ {{ faturamento|floatformat:2 }}</div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card">
                 <i class="fas fa-cut stat-icon"></i>
-                <div class="stat-label">Atendimentos Hoje</div>
-                <div class="stat-value">{{ atendimentos_hoje }}</div>
+                <div class="stat-label">Atendimentos Concluídos</div>
+                <div class="stat-value">{{ atendimentos_periodo }}</div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card">
                 <i class="far fa-calendar-check stat-icon"></i>
-                <div class="stat-label">Na Agenda</div>
-                <div class="stat-value">{{ agenda_hoje.count }} <small class="fs-6 fw-normal text-muted">clientes</small></div>
+                <div class="stat-label">Total na Agenda</div>
+                <div class="stat-value">{{ total_agendados }} <small class="fs-6 fw-normal text-muted">agendamentos</small></div>
             </div>
         </div>
     </div>
 
-    <!-- Tabela Principal -->
+    <!-- TABELA PRINCIPAL (AGENDA DO PERÍODO) -->
     <div class="card card-agenda mb-5">
         <div class="card-header bg-white py-4 px-4 border-bottom border-light">
-            <div class="d-flex align-items-center">
-                <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
-                    <i class="fas fa-clock text-warning"></i>
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                        <i class="fas fa-list text-warning"></i>
+                    </div>
+                    <h5 class="mb-0 fw-bold" style="font-family: 'Outfit';">
+                        {% if filtro_ativo %}Agenda do Período{% else %}Agenda de Hoje{% endif %}
+                    </h5>
                 </div>
-                <h5 class="mb-0 fw-bold" style="font-family: 'Outfit', sans-serif;">Agenda de Hoje</h5>
+                <span class="badge bg-light text-dark">{{ data_inicio|date:"d/m" }} até {{ data_fim|date:"d/m" }}</span>
             </div>
         </div>
         
@@ -274,23 +316,25 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4 py-3 text-muted text-uppercase small border-0">Horário</th>
-                        <th class="py-3 text-muted text-uppercase small border-0">Cliente</th>
-                        <th class="py-3 text-muted text-uppercase small border-0">Serviço</th>
-                        <th class="py-3 text-muted text-uppercase small border-0">Valor</th>
-                        <th class="py-3 text-muted text-uppercase small border-0 text-end pe-4">Ações</th>
+                        <th class="ps-4 py-3 text-muted small border-0">Data/Hora</th>
+                        <th class="py-3 text-muted small border-0">Cliente</th>
+                        <th class="py-3 text-muted small border-0">Serviço</th>
+                        <th class="py-3 text-muted small border-0">Valor</th>
+                        <th class="py-3 text-muted small border-0 text-end pe-4">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in agenda_hoje %}
-                    <!-- Adicionei uma condição na CLASSE da tr (linha) para ficar cinza se cancelado -->
+                    {% for item in agenda_periodo %}
                     <tr style="border-bottom: 1px solid #f9f9f9;" class="{% if item.status == 'CANCELADO' %}bg-light text-muted opacity-75{% endif %}">
                         
-                        <!-- Horário -->
+                        <!-- Data e Hora -->
                         <td class="ps-4">
-                            <span class="agenda-time {% if item.status == 'CANCELADO' %}text-decoration-line-through text-muted{% endif %}">
-                                {{ item.data_hora_inicio|date:"H:i" }}
-                            </span>
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-dark small">{{ item.data_hora_inicio|date:"d/m/Y" }}</span>
+                                <span class="agenda-time {% if item.status == 'CANCELADO' %}text-decoration-line-through text-muted{% endif %}">
+                                    {{ item.data_hora_inicio|date:"H:i" }}
+                                </span>
+                            </div>
                         </td>
                         
                         <!-- Cliente -->
@@ -307,7 +351,6 @@
                                     <div class="fw-bold {% if item.status == 'CANCELADO' %}text-muted{% else %}text-dark{% endif %}">
                                         {{ item.cliente.first_name|default:item.cliente.username }}
                                         
-                                        <!-- Só mostra botão de histórico se NÃO estiver cancelado -->
                                         {% if item.status != 'CANCELADO' %}
                                             <button class="btn btn-link p-0 ms-2 text-warning" onclick="abrirHistorico('{{ item.cliente.id }}', '{{ item.cliente.first_name }}')" data-bs-toggle="tooltip" title="Ver Prontuário">
                                                 <i class="fas fa-history"></i>
@@ -315,9 +358,6 @@
                                         {% endif %}
                                     </div>
                                     <div class="small text-muted">
-                                        {% if item.status != 'CANCELADO' %}
-                                            <i class="fab fa-whatsapp me-1 text-success"></i>
-                                        {% endif %}
                                         {{ item.cliente.telefone|default:"--" }}
                                     </div>
                                 </div>
@@ -336,44 +376,32 @@
                             R$ {{ item.servico.preco }}
                         </td>
                         
-                        <!-- Ações / Status -->
+                        <!-- Ações -->
                         <td class="text-end pe-4">
                             {% if item.status == 'AGENDADO' %}
-                                <!-- Botões de Ação Normais -->
-                                <button type="button" class="btn-action btn-action-success" onclick="prepararConclusao('{{ item.id }}', '{{ item.cliente.first_name }}')" data-bs-toggle="tooltip" title="Concluir e Anotar">
+                                <button type="button" class="btn-action btn-action-success" onclick="prepararConclusao('{{ item.id }}', '{{ item.cliente.first_name }}')" data-bs-toggle="tooltip" title="Concluir">
                                     <i class="fas fa-check"></i>
                                 </button>
-                                
                                 <a href="{% url 'mudar_status' item.id 'NAO_COMPARECEU' %}" class="btn-action btn-action-warning" data-bs-toggle="tooltip" title="Cliente Faltou">
                                     <i class="fas fa-eye-slash"></i>
                                 </a>
                                 <a href="{% url 'mudar_status' item.id 'CANCELADO' %}" class="btn-action btn-action-danger" data-bs-toggle="tooltip" title="Cancelar">
                                     <i class="fas fa-times"></i>
                                 </a>
-
                             {% elif item.status == 'CANCELADO' %}
-                                <!-- Badge de Cancelado -->
-                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 border border-danger border-opacity-25">
-                                    <i class="fas fa-ban me-1"></i> Cancelado
-                                </span>
-
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">Cancelado</span>
                             {% elif item.status == 'CONCLUIDO' %}
-                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">
-                                    <i class="fas fa-check me-1"></i> Concluído
-                                </span>
-
+                                <span class="badge bg-success bg-opacity-10 text-success">Concluído</span>
                             {% elif item.status == 'NAO_COMPARECEU' %}
-                                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">
-                                    Não Compareceu
-                                </span>
+                                <span class="badge bg-warning bg-opacity-10 text-warning">Faltou</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="5" class="text-center py-5">
-                            <div class="text-muted opacity-50 mb-2"><i class="fas fa-coffee fa-3x"></i></div>
-                            <p class="text-muted">Nenhum agendamento para hoje.</p>
+                            <div class="text-muted opacity-50 mb-2"><i class="fas fa-calendar-day fa-3x"></i></div>
+                            <p class="text-muted">Nenhum agendamento encontrado neste período.</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -382,12 +410,12 @@
         </div>
     </div>
 
-    <!-- Próximos Agendamentos -->
+    <!-- PRÓXIMOS AGENDAMENTOS (ACCORDION) -->
     <div class="accordion accordion-clean mb-5" id="accordionFuture">
-        <div class="accordion-item">
+        <div class="accordion-item border-0 shadow-sm">
             <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFuture">
-                    <i class="far fa-calendar-alt me-2"></i> Visualizar Próximos Agendamentos
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFuture">
+                    <i class="far fa-calendar-alt me-2"></i> Agendamentos Futuros (Geral)
                 </button>
             </h2>
             <div id="collapseFuture" class="accordion-collapse collapse" data-bs-parent="#accordionFuture">
@@ -395,17 +423,12 @@
                     <div class="list-group list-group-flush rounded-3">
                         {% for item in agenda_futura %}
                         
-                        <!-- Adicionei opacidade se for cancelado -->
                         <div class="list-group-item border-0 d-flex justify-content-between align-items-center py-3 px-4 hover-bg-light {% if item.status == 'CANCELADO' %}bg-light opacity-50{% endif %}">
-                            
                             <div class="d-flex align-items-center">
-                                <!-- Data Box -->
                                 <div class="bg-light rounded p-2 text-center me-3" style="min-width: 50px;">
                                     <div class="small fw-bold text-uppercase text-muted">{{ item.data_hora_inicio|date:"M" }}</div>
                                     <div class="h5 mb-0 fw-bold text-dark">{{ item.data_hora_inicio|date:"d" }}</div>
                                 </div>
-                                
-                                <!-- Info do Cliente -->
                                 <div>
                                     <div class="fw-bold {% if item.status == 'CANCELADO' %}text-decoration-line-through text-muted{% endif %}">
                                         {% if item.cliente.first_name %}
@@ -420,13 +443,11 @@
                                 </div>
                             </div>
 
-                            <!-- BADGE CONDICIONAL -->
                             {% if item.status == 'CANCELADO' %}
                                 <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">Cancelado</span>
                             {% else %}
                                 <span class="badge bg-light text-secondary">Futuro</span>
                             {% endif %}
-                            
                         </div>
                         {% empty %}
                         <div class="text-center py-3 text-muted small">Nenhum agendamento futuro encontrado.</div>
@@ -451,7 +472,6 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     <p class="text-muted">Cliente: <strong id="nomeClienteModal"></strong></p>
-                    
                     <div class="mb-3">
                         <label class="form-label text-warning fw-bold small text-uppercase">Notas Técnicas (Prontuário)</label>
                         <textarea name="anotacoes" class="form-control bg-light border-0" rows="4" placeholder="Ex: Máquina 2 na lateral, tesoura em cima. Cliente gosta do pezinho quadrado."></textarea>
@@ -492,14 +512,9 @@
 <script>
     // 1. Lógica para abrir o Modal de Conclusão
     function prepararConclusao(id, nome) {
-        // Atualiza o nome do cliente no modal
         document.getElementById('nomeClienteModal').textContent = nome;
-        
-        // Atualiza a URL do formulário (Action) para mandar pro ID certo
         const form = document.getElementById('formConclusao');
-        form.action = `/agendamento/concluir/${id}/`; // Atenção à barra no final
-        
-        // Abre o modal
+        form.action = `/agendamento/concluir/${id}/`; 
         var modal = new bootstrap.Modal(document.getElementById('modalConclusao'));
         modal.show();
     }
@@ -513,7 +528,6 @@
         var modal = new bootstrap.Modal(document.getElementById('modalHistorico'));
         modal.show();
 
-        // Faz a requisição AJAX para nossa API
         fetch(`/agendamento/api/historico/${clienteId}/`)
             .then(response => response.json())
             .then(data => {
@@ -525,7 +539,6 @@
                     return;
                 }
 
-                // Monta o HTML do histórico
                 let html = '';
                 data.historico.forEach(item => {
                     html += `
@@ -542,6 +555,33 @@
                 console.error('Erro:', error);
                 document.getElementById('loadingHistorico').innerHTML = '<p class="text-danger">Erro ao carregar histórico.</p>';
             });
+    }
+
+    // --- SCRIPT DOS BOTÕES DE FILTRO ---
+    function aplicarFiltro(periodo) {
+        const hoje = new Date();
+        let inicio = new Date();
+        let fim = new Date(); // Por padrão, fim é hoje
+
+        if (periodo === 'hoje') {
+            // Início e Fim são hoje (Não faz nada)
+        } else if (periodo === 'semana') {
+            // ALTERAÇÃO AQUI:
+            // Em vez de somar no fim, subtraímos do início
+            inicio.setDate(hoje.getDate() - 7);
+            // O fim continua sendo "hoje"
+        } else if (periodo === 'mes') {
+            // Mês atual (Mantém igual)
+            inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+        }
+
+        // ... resto do código igual ...
+        const formatoData = (d) => d.toISOString().split('T')[0];
+        document.getElementById('dataInicio').value = formatoData(inicio);
+        document.getElementById('dataFim').value = formatoData(fim);
+
+        document.getElementById('filterForm').submit();
     }
 </script>
 {% endblock %}
