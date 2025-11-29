@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db.models import Sum
 from .models import Agendamento
 from .forms import AgendamentoForm
-
+from django.http import JsonResponse
 
 @login_required
 def novo_agendamento(request):
@@ -97,3 +97,44 @@ def mudar_status(request, agendamento_id, novo_status):
         messages.success(request, f"Status atualizado para {agendamento.get_status_display()}")
     
     return redirect('listar_agendamentos')
+
+@login_required
+def concluir_agendamento(request, agendamento_id):
+    if request.method == 'POST':
+        agendamento = get_object_or_404(Agendamento, id=agendamento_id)
+        
+        # Segurança
+        if request.user != agendamento.profissional:
+            messages.error(request, "Acesso negado.")
+            return redirect('listar_agendamentos')
+        
+        # Salva a nota e muda o status
+        nota = request.POST.get('anotacoes')
+        agendamento.anotacoes = nota
+        agendamento.status = 'CONCLUIDO'
+        agendamento.save()
+        
+        messages.success(request, "Atendimento concluído e prontuário salvo!")
+        return redirect('listar_agendamentos')
+
+@login_required
+def obter_historico_cliente(request, cliente_id):
+    """
+    Retorna um JSON com os cortes passados desse cliente.
+    Usaremos isso para mostrar no Modal de Histórico sem recarregar a página.
+    """
+    cortes_passados = Agendamento.objects.filter(
+        cliente_id=cliente_id,
+        profissional=request.user, # Só mostra o que esse barbeiro fez (opcional)
+        status='CONCLUIDO'
+    ).order_by('-data_hora_inicio')[:5] # Pega os últimos 5
+    
+    data = []
+    for corte in cortes_passados:
+        data.append({
+            'data': corte.data_hora_inicio.strftime('%d/%m/%Y'),
+            'servico': corte.servico.nome,
+            'nota': corte.anotacoes or "Sem anotações."
+        })
+    
+    return JsonResponse({'historico': data})

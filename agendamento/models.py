@@ -28,6 +28,7 @@ class Agendamento(models.Model):
     
     data_hora_inicio = models.DateTimeField()
     data_hora_fim = models.DateTimeField(editable=False, blank=True, null=True) 
+    anotacoes = models.TextField(blank=True, null=True, help_text="Campo exclusivo para o profissional (Prontuário)")
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='AGENDADO')
     criado_em = models.DateTimeField(auto_now_add=True)

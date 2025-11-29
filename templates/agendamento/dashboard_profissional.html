@@ -162,6 +162,24 @@
     
     /* Hover helper */
     .hover-bg-light:hover { background-color: #f8f9fa; }
+
+     /* Adicione apenas este estilo extra para a lista de histórico */
+    .timeline-item {
+        border-left: 2px solid #e9ecef;
+        padding-left: 20px;
+        padding-bottom: 20px;
+        position: relative;
+    }
+    .timeline-item::before {
+        content: '';
+        width: 12px;
+        height: 12px;
+        background: #c5a059;
+        border-radius: 50%;
+        position: absolute;
+        left: -7px;
+        top: 5px;
+    }
 </style>
 {% endblock %}
 
@@ -230,59 +248,48 @@
                 <tbody>
                     {% for item in agenda_hoje %}
                     <tr style="border-bottom: 1px solid #f9f9f9;">
-                        <!-- Horário -->
-                        <td class="ps-4">
-                            <span class="agenda-time">{{ item.data_hora_inicio|date:"H:i" }}</span>
-                        </td>
+                        <td class="ps-4"><span class="agenda-time">{{ item.data_hora_inicio|date:"H:i" }}</span></td>
                         
-                        <!-- Cliente (Foto + Nome + Telefone) -->
                         <td>
                             <div class="d-flex align-items-center">
+                                <!-- Avatar -->
                                 {% if item.cliente.foto %}
                                     <img src="{{ item.cliente.foto.url }}" class="client-avatar me-3">
                                 {% else %}
-                                    <div class="client-avatar-placeholder me-3">
-                                        {{ item.cliente.username|first|upper }}
-                                    </div>
+                                    <div class="client-avatar-placeholder me-3">{{ item.cliente.username|first|upper }}</div>
                                 {% endif %}
+                                
+                                <!-- Info Cliente + Botão Histórico -->
                                 <div>
                                     <div class="fw-bold text-dark">
-                                        {% if item.cliente.first_name %}
-                                            {{ item.cliente.first_name }} {{ item.cliente.last_name }}
-                                        {% else %}
-                                            {{ item.cliente.username }}
-                                        {% endif %}
+                                        {{ item.cliente.first_name|default:item.cliente.username }}
+                                        <!-- BOTÃO VER HISTÓRICO -->
+                                        <button class="btn btn-link p-0 ms-2 text-warning" onclick="abrirHistorico('{{ item.cliente.id }}', '{{ item.cliente.first_name }}')" data-bs-toggle="tooltip" title="Ver Prontuário">
+                                            <i class="fas fa-history"></i>
+                                        </button>
                                     </div>
                                     <div class="small text-muted">
                                         <i class="fab fa-whatsapp me-1 text-success"></i>
-                                        {{ item.cliente.telefone|default:"Sem telefone" }}
+                                        {{ item.cliente.telefone|default:"--" }}
                                     </div>
                                 </div>
                             </div>
                         </td>
                         
-                        <!-- Serviço -->
-                        <td>
-                            <span class="badge bg-light text-dark fw-normal px-3 py-2 rounded-pill border">
-                                {{ item.servico.nome }}
-                            </span>
-                        </td>
+                        <td><span class="badge bg-light text-dark fw-normal px-3 py-2 rounded-pill border">{{ item.servico.nome }}</span></td>
+                        <td class="fw-medium text-dark">R$ {{ item.servico.preco }}</td>
                         
-                        <!-- Valor -->
-                        <td class="fw-medium text-dark">
-                            R$ {{ item.servico.preco }}
-                        </td>
-                        
-                        <!-- Ações -->
                         <td class="text-end pe-4">
                             {% if item.status == 'AGENDADO' %}
-                                <a href="{% url 'mudar_status' item.id 'CONCLUIDO' %}" class="btn-action btn-action-success" data-bs-toggle="tooltip" title="Concluir Atendimento">
+                                <!-- BOTÃO CONCLUIR (Abre Modal) -->
+                                <button type="button" class="btn-action btn-action-success" onclick="prepararConclusao('{{ item.id }}', '{{ item.cliente.first_name }}')" data-bs-toggle="tooltip" title="Concluir e Anotar">
                                     <i class="fas fa-check"></i>
-                                </a>
+                                </button>
+                                
                                 <a href="{% url 'mudar_status' item.id 'NAO_COMPARECEU' %}" class="btn-action btn-action-warning" data-bs-toggle="tooltip" title="Cliente Faltou">
                                     <i class="fas fa-eye-slash"></i>
                                 </a>
-                                <a href="{% url 'mudar_status' item.id 'CANCELADO' %}" class="btn-action btn-action-danger" data-bs-toggle="tooltip" title="Cancelar Agendamento">
+                                <a href="{% url 'mudar_status' item.id 'CANCELADO' %}" class="btn-action btn-action-danger" data-bs-toggle="tooltip" title="Cancelar">
                                     <i class="fas fa-times"></i>
                                 </a>
                             {% else %}
@@ -296,12 +303,7 @@
                         </td>
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center py-5">
-                            <div class="text-muted opacity-50 mb-2"><i class="fas fa-coffee fa-3x"></i></div>
-                            <p class="text-muted">Nenhum agendamento para hoje.</p>
-                        </td>
-                    </tr>
+                    <tr><td colspan="5" class="text-center py-5"><p class="text-muted">Nenhum agendamento para hoje.</p></td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -349,14 +351,110 @@
     </div>
 
 </div>
+
+<!-- MODAL 1: CONCLUIR ATENDIMENTO -->
+<div class="modal fade" id="modalConclusao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Concluir Atendimento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formConclusao" method="post" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p class="text-muted">Cliente: <strong id="nomeClienteModal"></strong></p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-warning fw-bold small text-uppercase">Notas Técnicas (Prontuário)</label>
+                        <textarea name="anotacoes" class="form-control bg-light border-0" rows="4" placeholder="Ex: Máquina 2 na lateral, tesoura em cima. Cliente gosta do pezinho quadrado."></textarea>
+                        <div class="form-text">Isso fica visível apenas para você no futuro.</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success px-4 rounded-pill">Salvar e Concluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 2: HISTÓRICO DO CLIENTE -->
+<div class="modal fade" id="modalHistorico" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Prontuário: <span id="histNomeCliente" class="text-warning"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="loadingHistorico" class="text-center py-3">
+                    <div class="spinner-border text-warning" role="status"></div>
+                </div>
+                <div id="listaHistorico" class="mt-2">
+                    <!-- O JS vai preencher isso aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    // Inicializar Tooltips do Bootstrap
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+    // 1. Lógica para abrir o Modal de Conclusão
+    function prepararConclusao(id, nome) {
+        // Atualiza o nome do cliente no modal
+        document.getElementById('nomeClienteModal').textContent = nome;
+        
+        // Atualiza a URL do formulário (Action) para mandar pro ID certo
+        const form = document.getElementById('formConclusao');
+        form.action = `/agendamento/concluir/${id}/`; // Atenção à barra no final
+        
+        // Abre o modal
+        var modal = new bootstrap.Modal(document.getElementById('modalConclusao'));
+        modal.show();
+    }
+
+    // 2. Lógica para buscar e mostrar o Histórico
+    function abrirHistorico(clienteId, nome) {
+        document.getElementById('histNomeCliente').textContent = nome;
+        document.getElementById('loadingHistorico').style.display = 'block';
+        document.getElementById('listaHistorico').innerHTML = '';
+        
+        var modal = new bootstrap.Modal(document.getElementById('modalHistorico'));
+        modal.show();
+
+        // Faz a requisição AJAX para nossa API
+        fetch(`/agendamento/api/historico/${clienteId}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingHistorico').style.display = 'none';
+                const lista = document.getElementById('listaHistorico');
+                
+                if (data.historico.length === 0) {
+                    lista.innerHTML = '<p class="text-center text-muted">Nenhum registro anterior encontrado.</p>';
+                    return;
+                }
+
+                // Monta o HTML do histórico
+                let html = '';
+                data.historico.forEach(item => {
+                    html += `
+                        <div class="timeline-item">
+                            <span class="badge bg-light text-dark mb-1">${item.data}</span>
+                            <strong class="d-block small text-uppercase text-muted">${item.servico}</strong>
+                            <p class="mb-0 mt-1 small">${item.nota}</p>
+                        </div>
+                    `;
+                });
+                lista.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                document.getElementById('loadingHistorico').innerHTML = '<p class="text-danger">Erro ao carregar histórico.</p>';
+            });
+    }
 </script>
 {% endblock %}
