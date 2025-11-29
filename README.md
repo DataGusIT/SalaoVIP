@@ -17,10 +17,9 @@ Construído com Python e Django, o sistema possui uma lógica de agendamento ava
 
 | Página Inicial | Dashboard do Profissional | Gestão de Disponibilidade |
 | :---: | :---: | :---: |
-| ![Página Inicial](link-para-sua-imagem-index) | ![Dashboard do Profissional](link-para-sua-imagem-dash_profissional) | ![Gestão de Disponibilidade Semanal](link-para-sua-imagem-agenda) |
+| <img alt="Página Inicial" src="https://github.com/user-attachments/assets/5c37d46d-a5a7-41fb-b744-e21ac5cfb29f" /> | <img alt="Dashboard do Profissional" src="https://github.com/user-attachments/assets/07a64213-19bb-4c48-a867-08290571a9b3" /> | <img alt="Gestão de Disponibilidade" src="https://github.com/user-attachments/assets/6956e4c1-eeec-4e60-afb3-9e690a7b0d8b" /> |
 | **Perfil do Usuário** | **Agendamento para Clientes** | **Histórico de Visitas** |
-| ![Perfil do Usuário](link-para-sua-imagem-perfil) | ![Tela de Agendamento de Horário](link-para-sua-imagem-agendar_horario) | ![Histórico de Agendamentos do Cliente](link-para-sua-imagem-historico_agendamentos) |
-
+| <img alt="Perfil do Usuário" src="https://github.com/user-attachments/assets/86288918-dc42-41ee-bd7c-2a312a090b78" /> | <img alt="Tela de Agendamento" src="https://github.com/user-attachments/assets/5ffea7cd-b9a6-4f2d-b612-9bb88e8e0f93" /> | <img alt="Histórico de Visitas" src="https://github.com/user-attachments/assets/bbc44a8a-d28e-4792-9d84-ad3302f550e2" /> |
 
 ## ✨ Funcionalidades
 
@@ -124,7 +123,7 @@ Este projeto está licenciado sob uma Licença Proprietária.
 <div align="center">
   Desenvolvido por Gustavo Moreno
   <br><br>
-  <a href="https://www.linkedin.com/in/gustavo-moreno-8a925b26a/" target="_blank">
+  <a href="https://www.linkedin.com/in/gustavo-moreno-8a925b26a/" target-blank">
     <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="24" alt="LinkedIn"/>
   </a>
 </div>
