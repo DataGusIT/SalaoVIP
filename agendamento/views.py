@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Sum
 from django.forms import modelformset_factory
-from .models import Agendamento, HorarioTrabalho
+from .models import Agendamento, HorarioTrabalho, Servico, Portfolio
 from .forms import AgendamentoForm
 from django.http import JsonResponse
 from datetime import datetime, timedelta, time
@@ -173,75 +173,159 @@ def configurar_horarios(request):
 
     return render(request, 'agendamento/configurar_horarios.html', {'formset': formset})
 
+# agendamento/views.py
+
 def get_horarios_disponiveis(request):
     profissional_id = request.GET.get('profissional_id')
-    data_str = request.GET.get('data') # Formato YYYY-MM-DD
-    
-    if not profissional_id or not data_str:
+    data_str = request.GET.get('data')
+    servico_id = request.GET.get('servico_id')
+
+    print(f"--- DEBUG AGENDA ---")
+    print(f"Recebido: Prof={profissional_id}, Data={data_str}, Servico={servico_id}")
+
+    # Validação inicial
+    if not all([profissional_id, data_str, servico_id]):
+        print("ERRO: Faltando parâmetros.")
         return JsonResponse({'horarios': []})
 
-    # Converte string para data
-    data_obj = datetime.strptime(data_str, "%Y-%m-%d").date()
-    dia_semana = data_obj.weekday()
+    try:
+        data_obj = datetime.strptime(data_str, "%Y-%m-%d").date()
+        dia_semana = data_obj.weekday()
+        print(f"Dia da semana: {dia_semana} (0=Seg, 6=Dom)")
+    except ValueError:
+        print("ERRO: Formato de data inválido.")
+        return JsonResponse({'horarios': []})
 
-    # 1. Verifica se trabalha neste dia
+    # 1. Busca Serviço
+    try:
+        servico = Servico.objects.get(id=servico_id)
+        duracao = servico.duracao_minutos
+        print(f"Serviço encontrado: {servico.nome}, Duração: {duracao}min")
+    except Servico.DoesNotExist:
+        print("ERRO: Serviço não encontrado.")
+        return JsonResponse({'horarios': [], 'erro': 'Serviço inválido'})
+
+    # 2. Busca Horário de Trabalho
     try:
         horario_config = HorarioTrabalho.objects.get(
             profissional_id=profissional_id, 
             dia_semana=dia_semana
         )
+        print(f"Horário Config: {horario_config.hora_inicio} às {horario_config.hora_fim} | Folga: {horario_config.folga}")
     except HorarioTrabalho.DoesNotExist:
-        return JsonResponse({'horarios': [], 'erro': 'Profissional não atende neste dia da semana.'})
+        print("ERRO: Sem configuração de horário para este dia.")
+        return JsonResponse({'horarios': [], 'erro': 'Profissional não atende neste dia.'})
 
     if horario_config.folga:
+        print("ERRO: Dia de folga.")
         return JsonResponse({'horarios': [], 'erro': 'Dia de folga.'})
 
-    # 2. Gera todos os slots possíveis (de 30 em 30 min)
-    # Nota: Idealmente o intervalo viria da duração do serviço, mas vamos fixar 30min por simplicidade agora
-    intervalo = 30 
-    slots_possiveis = []
+    # 3. Gera slots
+    slots_disponiveis = []
     
+    # Datas com horário combinados (Naive - sem fuso horário para cálculo matemático)
     hora_atual = datetime.combine(data_obj, horario_config.hora_inicio)
     hora_fim_trab = datetime.combine(data_obj, horario_config.hora_fim)
     
-    # Prepara horários de almoço
     almoco_inicio = datetime.combine(data_obj, horario_config.almoco_inicio) if horario_config.almoco_inicio else None
     almoco_fim = datetime.combine(data_obj, horario_config.almoco_fim) if horario_config.almoco_fim else None
 
-    # Busca agendamentos já existentes nesse dia
+    # Busca agendamentos (Aware - com fuso horário)
     agendamentos = Agendamento.objects.filter(
         profissional_id=profissional_id,
         data_hora_inicio__date=data_obj,
         status='AGENDADO'
     )
+    print(f"Agendamentos já existentes no dia: {agendamentos.count()}")
 
-    while hora_atual + timedelta(minutes=intervalo) <= hora_fim_trab:
-        slot_fim = hora_atual + timedelta(minutes=intervalo)
+    # Loop de slots (Intervalo de 30 min para início)
+    step = 30 
+    
+    while hora_atual + timedelta(minutes=duracao) <= hora_fim_trab:
+        hora_termino_servico = hora_atual + timedelta(minutes=duracao)
         
-        # Validação 1: Almoço
-        no_almoco = False
+        # --- Validações ---
+        motivo_bloqueio = None
+
+        # A. Almoço (Logica Naive vs Naive)
         if almoco_inicio and almoco_fim:
-            # Se o slot começa dentro do almoço OU termina dentro dele
-            if (hora_atual >= almoco_inicio and hora_atual < almoco_fim) or \
-               (slot_fim > almoco_inicio and slot_fim <= almoco_fim):
-                no_almoco = True
-        
-        # Validação 2: Conflito com Agendamentos
-        ocupado = False
-        for agendamento in agendamentos:
-            # Lógica de overlap
-            # Make aware garante que estamos comparando fusos certos
-            start_aware = make_aware(hora_atual)
-            end_aware = make_aware(slot_fim)
-            
-            if start_aware < agendamento.data_hora_fim and end_aware > agendamento.data_hora_inicio:
-                ocupado = True
-                break
-        
-        # Se passou nos testes, adiciona
-        if not no_almoco and not ocupado:
-            slots_possiveis.append(hora_atual.strftime("%H:%M"))
-            
-        hora_atual += timedelta(minutes=intervalo)
+            if (hora_atual < almoco_fim) and (hora_termino_servico > almoco_inicio):
+                motivo_bloqueio = "Almoço"
 
-    return JsonResponse({'horarios': slots_possiveis})
+        # B. Conflitos (Lógica Aware vs Aware)
+        if not motivo_bloqueio:
+            slot_inicio_aware = make_aware(hora_atual)
+            slot_fim_aware = make_aware(hora_termino_servico)
+            
+            for agendamento in agendamentos:
+                # Se slot começa antes de terminar o agendamento E termina depois de começar o agendamento
+                if (slot_inicio_aware < agendamento.data_hora_fim) and (slot_fim_aware > agendamento.data_hora_inicio):
+                    motivo_bloqueio = f"Conflito agenda ({agendamento.data_hora_inicio.time()})"
+                    break
+        
+        # C. Passado (Não deixar agendar para trás se for hoje)
+        if not motivo_bloqueio:
+            agora = timezone.now()
+            # Se for hoje e o horário já passou
+            if data_obj == agora.date() and make_aware(hora_atual) < agora:
+                 motivo_bloqueio = "Horário já passou"
+
+        # Adiciona ou Loga erro
+        if not motivo_bloqueio:
+            slots_disponiveis.append(hora_atual.strftime("%H:%M"))
+        # else:
+            # print(f"Slot {hora_atual.time()} bloqueado por: {motivo_bloqueio}") 
+
+        hora_atual += timedelta(minutes=step)
+
+    print(f"Total slots livres: {len(slots_disponiveis)}")
+    return JsonResponse({'horarios': slots_disponiveis})
+
+# Precisamos também de uma API para filtrar serviços pelo profissional
+def api_get_servicos_por_profissional(request, profissional_id):
+    servicos = Servico.objects.filter(profissional_id=profissional_id, ativo=True).values('id', 'nome', 'preco', 'duracao_minutos')
+    return JsonResponse({'servicos': list(servicos)})
+
+
+@login_required
+def gerenciar_servicos(request):
+    if request.user.tipo != 'CABELEIREIRO':
+        return redirect('home')
+        
+    ServicoFormSet = modelformset_factory(Servico, fields=('nome', 'preco', 'duracao_minutos', 'ativo'), extra=1, can_delete=True)
+    
+    if request.method == 'POST':
+        formset = ServicoFormSet(request.POST, queryset=Servico.objects.filter(profissional=request.user))
+        if formset.is_valid():
+            instances = formset.save(commit=False)
+            for instance in instances:
+                instance.profissional = request.user
+                instance.save()
+            # Deletar os marcados para exclusão
+            for obj in formset.deleted_objects:
+                obj.delete()
+            messages.success(request, "Serviços atualizados!")
+            return redirect('gerenciar_servicos')
+    else:
+        formset = ServicoFormSet(queryset=Servico.objects.filter(profissional=request.user))
+
+    return render(request, 'agendamento/gerenciar_servicos.html', {'formset': formset})
+
+@login_required
+def upload_foto_portfolio(request):
+    if request.method == 'POST' and request.FILES.get('imagem_portfolio'):
+        Portfolio.objects.create(
+            profissional=request.user,
+            imagem=request.FILES['imagem_portfolio'],
+            descricao=request.POST.get('descricao', 'Trabalho realizado')
+        )
+        messages.success(request, "Foto adicionada ao portfólio!")
+    
+    return redirect('editar_perfil')
+
+@login_required
+def deletar_foto_portfolio(request, foto_id):
+    foto = get_object_or_404(Portfolio, id=foto_id, profissional=request.user)
+    foto.delete()
+    messages.success(request, "Foto removida.")
+    return redirect('editar_perfil')

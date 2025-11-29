@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Nossos Talentos | Salão VIP{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold display-5">Nossos Especialistas</h1>
+        <p class="text-muted lead">Conheça a equipe e escolha seu estilo</p>
+    </div>
+
+    <div class="row g-4">
+        {% for prof in profissionais %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                <!-- Cabeçalho do Card -->
+                <div class="p-4 text-center bg-white border-bottom">
+                    {% if prof.foto %}
+                        <img src="{{ prof.foto.url }}" class="rounded-circle mb-3 border border-3 border-warning" style="width: 120px; height: 120px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px; font-size: 2rem;">{{ prof.username|first }}</div>
+                    {% endif %}
+                    <h4 class="fw-bold mb-1">{{ prof.first_name }} {{ prof.last_name }}</h4>
+                    <span class="badge bg-light text-dark mb-3">Cabeleireiro VIP</span>
+                    
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'novo_agendamento' %}?prof={{ prof.id }}" class="btn btn-vip w-100 rounded-pill">Agendar com {{ prof.first_name }}</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-dark w-100 rounded-pill">Login para Agendar</a>
+                    {% endif %}
+                </div>
+
+                <!-- Galeria Miniatura (Portfólio) -->
+                <div class="card-body bg-light">
+                    <h6 class="text-muted small text-uppercase fw-bold mb-3">Portfólio Recente</h6>
+                    <div class="row g-2">
+                        {% for foto in prof.portfolio.all|slice:":3" %}
+                        <div class="col-4">
+                            <img src="{{ foto.imagem.url }}" class="img-fluid rounded" style="aspect-ratio: 1/1; object-fit: cover;">
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-muted small fst-italic">Sem fotos ainda.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

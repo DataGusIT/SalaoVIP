@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from datetime import timedelta
 
 class Servico(models.Model):
+    # Adicionamos o vínculo com o profissional
+    profissional = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='servicos')
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True, null=True)
     preco = models.DecimalField(max_digits=10, decimal_places=2)
@@ -11,7 +13,16 @@ class Servico(models.Model):
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.nome} - R$ {self.preco}"
+        return f"{self.nome} ({self.duracao_minutos} min) - {self.profissional.first_name}"
+    
+class Portfolio(models.Model):
+    profissional = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='portfolio')
+    imagem = models.ImageField(upload_to='portfolio/')
+    descricao = models.CharField(max_length=200, blank=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Foto de {self.profissional}"
     
 class HorarioTrabalho(models.Model):
     DIAS_SEMANA = (

@@ -195,39 +195,72 @@
 {% block extra_scripts %}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // --- 1. Estilização dos Inputs (Seu código original) ---
-        const inputs = document.querySelectorAll('.vip-input-group input, .vip-input-group select, .vip-input-group textarea');
-        inputs.forEach(input => {
-            input.classList.remove('form-control'); 
-            input.style.width = "100%";
-        });
-
-        // --- 2. Lógica de Horários Inteligentes (Nova) ---
+        // --- 1. Definição de Variáveis ---
         const selectProfissional = document.getElementById('select-profissional'); 
+        const selectServico = document.getElementById('id_servico'); // <--- AGORA ELE EXISTE
         const inputData = document.getElementById('inputData');
         const containerHorarios = document.getElementById('containerHorarios');
         const inputHiddenDjango = document.getElementById('id_data_hora_inicio'); 
         const btnConfirmar = document.getElementById('btnConfirmar');
         const avisoErro = document.getElementById('avisoErro');
 
-        // Função para buscar horários na API
+        // --- 2. Estilização dos Inputs ---
+        const inputs = document.querySelectorAll('.vip-input-group input, .vip-input-group select, .vip-input-group textarea');
+        inputs.forEach(input => {
+            input.classList.remove('form-control'); 
+            input.style.width = "100%";
+        });
+
+        // --- 3. Lógica: Carregar Serviços do Profissional ---
+        if (selectProfissional) {
+            selectProfissional.addEventListener('change', function() {
+                const profId = this.value;
+                
+                // Limpa o select de serviços
+                selectServico.innerHTML = '<option value="">Carregando...</option>';
+                containerHorarios.innerHTML = ''; // Limpa horários antigos
+                
+                if (!profId) return;
+
+                fetch(`/agendamento/api/servicos/${profId}/`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let html = '<option value="">Selecione um serviço</option>';
+                        data.servicos.forEach(s => {
+                            html += `<option value="${s.id}">${s.nome} (${s.duracao_minutos} min) - R$ ${s.preco}</option>`;
+                        });
+                        selectServico.innerHTML = html;
+                    });
+            });
+        }
+
+        // --- 4. Lógica: Buscar Horários Disponíveis ---
         function carregarHorarios() {
             const profId = selectProfissional.value;
+            const servId = selectServico.value; // Pega o valor do serviço
             const dataVal = inputData.value;
 
-            // Limpa estado anterior
+            // Reset visual
             containerHorarios.innerHTML = '';
             avisoErro.textContent = '';
             btnConfirmar.disabled = true;
             inputHiddenDjango.value = '';
 
-            if (!profId || !dataVal) return;
+            // VALIDAÇÃO CRUCIAL: Só busca se tiver os 3 dados
+            if (!profId || !dataVal || !servId) {
+                if(profId && dataVal && !servId) {
+                    avisoErro.innerHTML = '<span class="text-warning"><i class="fas fa-exclamation-circle"></i> Selecione um serviço para calcular a duração.</span>';
+                }
+                return;
+            }
 
             // Mostra loading
             containerHorarios.innerHTML = '<span class="loading-slots"><i class="fas fa-spinner fa-spin me-2"></i>Verificando disponibilidade...</span>';
 
-            // Chama API
-            fetch(`/agendamento/api/horarios-disponiveis/?profissional_id=${profId}&data=${dataVal}`)
+            // Chama API enviando o servico_id
+            const url = `/agendamento/api/horarios-disponiveis/?profissional_id=${profId}&data=${dataVal}&servico_id=${servId}`;
+            
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     containerHorarios.innerHTML = '';
@@ -249,15 +282,9 @@
                         btn.textContent = hora;
                         
                         btn.onclick = function() {
-                            // Remove seleção visual dos outros
                             document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('selected'));
-                            // Seleciona este
                             btn.classList.add('selected');
-                            
-                            // Preenche o input oculto que o Django vai salvar
                             inputHiddenDjango.value = `${dataVal} ${hora}`;
-                            
-                            // Libera o botão de confirmar
                             btnConfirmar.disabled = false;
                         };
 
@@ -266,13 +293,14 @@
                 })
                 .catch(err => {
                     console.error(err);
-                    containerHorarios.innerHTML = '<span class="text-danger small">Erro de conexão ao buscar horários.</span>';
+                    containerHorarios.innerHTML = '<span class="text-danger small">Erro de conexão.</span>';
                 });
         }
 
-        // Adiciona os ouvintes de evento
+        // Adiciona os ouvintes de evento para recalcular quando mudar qualquer coisa
         if(selectProfissional) selectProfissional.addEventListener('change', carregarHorarios);
         if(inputData) inputData.addEventListener('change', carregarHorarios);
+        if(selectServico) selectServico.addEventListener('change', carregarHorarios); // <--- IMPORTANTE
         
         // Define data mínima no input date para hoje
         const today = new Date().toISOString().split('T')[0];

@@ -7,12 +7,12 @@ class AgendamentoForm(forms.ModelForm):
         model = Agendamento
         fields = ['servico', 'profissional', 'data_hora_inicio']
         widgets = {
-            'servico': forms.Select(attrs={'class': 'form-control'}),
+            # ADICIONE O ID AQUI EXPLICITAMENTE:
+            'servico': forms.Select(attrs={'class': 'form-control', 'id': 'id_servico'}),
             'profissional': forms.Select(attrs={'class': 'form-control', 'id': 'select-profissional'}),
-            # ESCONDEMOS ESSE CAMPO. O Javascript vai preencher ele.
             'data_hora_inicio': forms.HiddenInput(), 
         }
-    
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['profissional'].queryset = User.objects.filter(tipo='CABELEIREIRO')

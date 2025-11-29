@@ -64,6 +64,31 @@
         font-size: 1.5rem;
         margin-bottom: 1.5rem;
     }
+      /* Cards Profissionais */
+    .pro-card {
+        border: none;
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+    .pro-card:hover { transform: translateY(-5px); }
+    .pro-avatar {
+        width: 100px; height: 100px; object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #c5a059;
+        margin-top: -50px;
+        background: #fff;
+    }
+    .pro-cover {
+        height: 120px;
+        background: #333;
+        /* Se tiver foto de portfolio, usa a primeira como capa, senão usa cinza */
+        background-size: cover;
+        background-position: center;
+    }
 </style>
 {% endblock %}
 
@@ -135,6 +160,64 @@
             <h4 class="h5 fw-bold">Gestão Fácil</h4>
             <p class="text-muted small">Controle seus agendamentos, remarque e visualize seu histórico direto pelo celular.</p>
         </div>
+    </div>
+</div>
+
+<!-- SEÇÃO DE PROFISSIONAIS (VITRINE) -->
+<div class="mb-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold display-6" style="font-family: 'Outfit';">Nossos Especialistas</h2>
+        <p class="text-muted">Conheça os talentos que transformam o seu visual</p>
+    </div>
+
+    <div class="row g-4">
+        {% for prof in profissionais %}
+        <div class="col-md-6 col-lg-3">
+            <div class="pro-card text-center pb-4">
+                <!-- Capa (Pega a 1ª foto do portfolio ou usa padrão) -->
+                <div class="pro-cover" 
+                     style="{% if prof.portfolio.first %}background-image: url('{{ prof.portfolio.first.imagem.url }}');{% endif %}">
+                </div>
+                
+                <!-- Avatar -->
+                {% if prof.foto %}
+                    <img src="{{ prof.foto.url }}" class="pro-avatar shadow-sm">
+                {% else %}
+                    <div class="pro-avatar shadow-sm d-flex align-items-center justify-content-center mx-auto bg-light fs-3 text-muted">
+                        {{ prof.username|first|upper }}
+                    </div>
+                {% endif %}
+
+                <div class="px-3 mt-3">
+                    <h5 class="fw-bold mb-1">{{ prof.first_name }} {{ prof.last_name }}</h5>
+                    <p class="text-muted small text-uppercase mb-3">Cabeleireiro VIP</p>
+                    
+                    <!-- Mini Galeria (3 fotos) -->
+                    <div class="d-flex justify-content-center gap-1 mb-3">
+                        {% for item in prof.portfolio.all|slice:":3" %}
+                            <img src="{{ item.imagem.url }}" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                        {% empty %}
+                            <small class="text-muted fst-italic" style="font-size: 0.7rem;">Sem fotos de portfólio.</small>
+                        {% endfor %}
+                    </div>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'novo_agendamento' %}?prof={{ prof.id }}" class="btn btn-outline-dark btn-sm rounded-pill w-75">
+                            Agendar
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-sm rounded-pill w-75">
+                            Ver Perfil
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">Nenhum profissional cadastrado no momento.</p>
+        </div>
+        {% endfor %}
     </div>
 </div>
 

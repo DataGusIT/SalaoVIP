@@ -3,10 +3,15 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .forms import ClienteRegistroForm, PerfilForm
+from agendamento.models import Portfolio
+from .models import User
 
 def home(request):
-    return render(request, 'home.html')
+    # Busca apenas quem é cabeleireiro para mostrar na vitrine
+    profissionais = User.objects.filter(tipo='CABELEIREIRO')
+    return render(request, 'home.html', {'profissionais': profissionais})
 
 def registro(request):
     if request.method == 'POST':
@@ -55,3 +60,9 @@ def custom_logout(request):
     logout(request)
     messages.info(request, "Você saiu do sistema. Até logo!") # Toast de despedida
     return redirect('home')
+
+def lista_profissionais(request):
+    # Pega apenas usuários do tipo cabeleireiro
+    profissionais = User.objects.filter(tipo='CABELEIREIRO')
+    return render(request, 'users/profissionais.html', {'profissionais': profissionais})
+

@@ -122,6 +122,12 @@
     input[type="file"]::file-selector-button:hover {
         background: #e0e0e0;
     }
+     /* Estilo da Galeria */
+    .portfolio-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; group; }
+    .portfolio-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+    .portfolio-item:hover .portfolio-img { transform: scale(1.05); }
+    .delete-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+    .portfolio-item:hover .delete-overlay { opacity: 1; }
 </style>
 {% endblock %}
 
@@ -212,11 +218,72 @@
                                 </button>
                             </div>
                         </form>
+
+                        <!-- PORTFÓLIO (SÓ CABELEIREIRO) -->
+                        {% if user.tipo == 'CABELEIREIRO' %}
+                            <hr class="my-5">
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h3 class="fw-bold mb-0" style="font-family: 'Outfit';">Meu Portfólio <small class="text-muted fs-6 fw-normal">({{ user.portfolio.count }} fotos)</small></h3>
+                                <!-- BOTÃO QUE ABRE O MODAL -->
+                                <button type="button" class="btn btn-vip btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalPortfolio">
+                                    <i class="fas fa-camera me-1"></i> Nova Foto
+                                </button>
+                            </div>
+                            
+                            <div class="row g-3">
+                                {% for item in user.portfolio.all %}
+                                <div class="col-4 col-md-3">
+                                    <div class="portfolio-item shadow-sm">
+                                        <img src="{{ item.imagem.url }}" class="portfolio-img">
+                                        <div class="delete-overlay">
+                                            <a href="{% url 'deletar_foto_portfolio' item.id %}" class="btn btn-danger btn-sm rounded-circle">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12 text-center py-4 bg-light rounded-3">
+                                    <p class="text-muted mb-0 small">Nenhuma foto adicionada ao portfólio ainda.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                     
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE UPLOAD DE FOTO -->
+<div class="modal fade" id="modalPortfolio" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Adicionar ao Portfólio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'upload_foto_portfolio' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label vip-label">Selecione a Imagem</label>
+                        <input type="file" name="imagem_portfolio" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label vip-label">Legenda (Opcional)</label>
+                        <input type="text" name="descricao" class="form-control" placeholder="Ex: Degradê navalhado">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-vip rounded-pill px-4">Enviar Foto</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
