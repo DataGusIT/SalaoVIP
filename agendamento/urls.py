@@ -10,5 +10,7 @@ urlpatterns = [
     
     # Rota API para pegar o histórico via Javascript
     path('api/historico/<int:cliente_id>/', views.obter_historico_cliente, name='api_historico_cliente'),
+    path('configurar-horarios/', views.configurar_horarios, name='configurar_horarios'),
+    path('api/horarios-disponiveis/', views.get_horarios_disponiveis, name='api_horarios_disponiveis'),
 
 ]

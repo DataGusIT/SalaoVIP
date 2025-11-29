@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Configurar Horários | Salão VIP{% endblock %}
+
+{% block extra_head %}
+<style>
+    .config-wrapper {
+        min-height: 85vh;
+        padding: 3rem 0;
+    }
+
+    .card-config {
+        background: #fff;
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.04);
+        overflow: hidden;
+    }
+
+    /* Estilo da Tabela */
+    .table-config thead th {
+        border: none;
+        background-color: #fff;
+        color: #999;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .table-config td {
+        vertical-align: middle;
+        padding: 1rem 0.5rem;
+        border-bottom: 1px solid #f9f9f9;
+    }
+
+    .day-label {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+        color: #1a1a1a;
+        font-size: 0.95rem;
+    }
+
+    /* Inputs de Tempo Personalizados */
+    .time-input {
+        background-color: #f8f9fa;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 0.4rem 0.5rem;
+        text-align: center;
+        color: #333;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        width: 100%;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .time-input:focus {
+        background-color: #fff;
+        border-color: #c5a059;
+        box-shadow: 0 4px 10px rgba(197, 160, 89, 0.1);
+        outline: none;
+    }
+
+    /* Switch de Folga Customizado */
+    .form-check-input:checked {
+        background-color: #c5a059;
+        border-color: #c5a059;
+    }
+    
+    .form-check-input {
+        cursor: pointer;
+        width: 2.5em; /* Aumenta um pouco o switch */
+        height: 1.25em;
+    }
+
+    /* Efeito visual para linha de folga */
+    tr.is-folga {
+        opacity: 0.5;
+        background-color: #fafafa;
+    }
+    
+    tr.is-folga .time-input {
+        pointer-events: none; /* Impede clique */
+        background-color: #eee;
+        color: #aaa;
+    }
+
+    tr.is-folga .day-label {
+        text-decoration: line-through;
+        color: #999;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container config-wrapper">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <div class="card card-config">
+                <div class="card-header bg-white p-4 p-md-5 border-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h3 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Disponibilidade Semanal</h3>
+                            <p class="text-muted small mb-0">Defina seus horários de entrada, saída e intervalos.</p>
+                        </div>
+                        <a href="{% url 'listar_agendamentos' %}" class="btn btn-outline-light text-dark rounded-pill btn-sm border">
+                            <i class="fas fa-arrow-left me-1"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5 pt-2">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ formset.management_form }}
+
+                        <div class="table-responsive">
+                            <table class="table table-config align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 15%;">Dia da Semana</th>
+                                        <th style="width: 18%;" class="text-center">Entrada</th>
+                                        <th style="width: 18%;" class="text-center">Saída Almoço</th>
+                                        <th style="width: 18%;" class="text-center">Volta Almoço</th>
+                                        <th style="width: 18%;" class="text-center">Saída</th>
+                                        <th style="width: 13%;" class="text-center">Folga?</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for form in formset %}
+                                        {% for hidden in form.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                        
+                                        <tr class="schedule-row" id="row-{{ forloop.counter0 }}">
+                                            <td>
+                                                <div class="day-label">
+                                                    {{ form.instance.get_dia_semana_display }}
+                                                </div>
+                                            </td>
+                                            
+                                            <td class="px-2">
+                                                <input type="time" 
+                                                       name="{{ form.hora_inicio.html_name }}" 
+                                                       value="{{ form.hora_inicio.value|date:'H:i' }}" 
+                                                       class="time-input">
+                                            </td>
+                                            
+                                            <td class="px-2">
+                                                <input type="time" 
+                                                       name="{{ form.almoco_inicio.html_name }}" 
+                                                       value="{{ form.almoco_inicio.value|date:'H:i'|default:'' }}" 
+                                                       class="time-input text-secondary">
+                                            </td>
+                                            
+                                            <td class="px-2">
+                                                <input type="time" 
+                                                       name="{{ form.almoco_fim.html_name }}" 
+                                                       value="{{ form.almoco_fim.value|date:'H:i'|default:'' }}" 
+                                                       class="time-input text-secondary">
+                                            </td>
+
+                                            <td class="px-2">
+                                                <input type="time" 
+                                                       name="{{ form.hora_fim.html_name }}" 
+                                                       value="{{ form.hora_fim.value|date:'H:i' }}" 
+                                                       class="time-input">
+                                            </td>
+                                            
+                                            <td class="text-center">
+                                                <div class="form-check form-switch d-flex justify-content-center">
+                                                    {{ form.folga }} 
+                                                    </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-end align-items-center mt-5 pt-3 border-top">
+                            <button type="button" class="btn btn-link text-muted text-decoration-none me-3" onclick="history.back()">Cancelar</button>
+                            <button type="submit" class="btn btn-vip rounded-pill px-5 py-2 shadow-sm">
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Seleciona todas as linhas
+        const rows = document.querySelectorAll('.schedule-row');
+
+        rows.forEach(row => {
+            // Encontra o checkbox de folga dentro da linha
+            // O Django renderiza como input[type=checkbox], então buscamos ele
+            const folgaCheckbox = row.querySelector('input[type="checkbox"]');
+            
+            if (folgaCheckbox) {
+                // Adiciona a classe do Bootstrap para virar Switch
+                folgaCheckbox.classList.add('form-check-input');
+
+                // Função para atualizar o estado visual da linha
+                const updateRowState = () => {
+                    if (folgaCheckbox.checked) {
+                        row.classList.add('is-folga');
+                    } else {
+                        row.classList.remove('is-folga');
+                    }
+                };
+
+                // Executa ao carregar (para estados já salvos)
+                updateRowState();
+
+                // Executa sempre que clicar
+                folgaCheckbox.addEventListener('change', updateRowState);
+            }
+        });
+    });
+</script>
+{% endblock %}

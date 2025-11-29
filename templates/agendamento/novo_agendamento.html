@@ -4,7 +4,7 @@
 
 {% block extra_head %}
 <style>
-    /* Wrapper para centralizar e dar respiro */
+    /* --- SEU ESTILO ORIGINAL --- */
     .appointment-wrapper {
         min-height: 80vh;
         display: flex;
@@ -16,12 +16,11 @@
     .card-clean {
         background: #fff;
         border: none;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.05); /* Sombra difusa premium */
+        box-shadow: 0 15px 50px rgba(0,0,0,0.05);
         border-radius: 24px;
         overflow: hidden;
     }
 
-    /* Cabeçalho interno sutil */
     .form-header {
         text-align: center;
         margin-bottom: 2.5rem;
@@ -34,13 +33,12 @@
         margin-top: 1rem;
     }
 
-    /* Estilo dos Inputs (Consistente com Registro) */
     .vip-input-group label {
         font-size: 0.8rem;
         text-transform: uppercase;
         letter-spacing: 1px;
         font-weight: 600;
-        color: #c5a059; /* Label Dourado */
+        color: #c5a059;
         margin-bottom: 0.5rem;
         display: block;
     }
@@ -67,12 +65,10 @@
         outline: none;
     }
 
-    /* Ajuste específico para input de data/hora se houver */
     input[type="date"], input[type="datetime-local"] {
         color: #555;
     }
 
-    /* Link de cancelar discreto */
     .btn-cancel {
         color: #999;
         text-decoration: none;
@@ -81,6 +77,43 @@
     }
     .btn-cancel:hover {
         color: #333;
+    }
+
+    /* --- NOVOS ESTILOS (Para os botões de horário) --- */
+    /* Mantendo a identidade VIP */
+    .time-slot-btn {
+        border: 1px solid #e0e0e0;
+        color: #555;
+        background: #fafafa;
+        padding: 10px 15px;
+        margin: 5px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        font-size: 0.9rem;
+        flex: 1 0 20%; /* Grid flexível */
+        text-align: center;
+        min-width: 80px;
+    }
+
+    .time-slot-btn:hover {
+        border-color: #c5a059;
+        color: #c5a059;
+        background: #fff;
+    }
+
+    .time-slot-btn.selected {
+        background-color: #c5a059;
+        border-color: #c5a059;
+        color: white;
+        box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3);
+    }
+
+    .loading-slots {
+        color: #999;
+        font-style: italic;
+        font-size: 0.9rem;
     }
 </style>
 {% endblock %}
@@ -96,35 +129,52 @@
                     <i class="fas fa-calendar-alt text-warning me-1"></i> Reserva Online
                 </span>
                 <h4>Agendar Experiência</h4>
-                <p class="text-muted small">Escolha o serviço e o melhor horário para você</p>
+                <p class="text-muted small">Escolha o profissional, o dia e o horário perfeito.</p>
             </div>
 
             <div class="card-body p-0">
-                <form method="post">
+                <form method="post" id="formAgendamento">
                     {% csrf_token %}
                     
-                    {% for field in form %}
+                    <!-- Campo Oculto (Django vai ler este campo no final) -->
+                    {{ form.data_hora_inicio }}
+
+                    <!-- 1. Profissional -->
                     <div class="mb-4 vip-input-group">
-                        <label>{{ field.label }}</label>
-                        
-                        {{ field }}
-                        
-                        {% if field.help_text %}
-                            <small class="d-block mt-1 text-muted" style="font-size: 0.75rem;">
-                                <i class="fas fa-info-circle me-1"></i>{{ field.help_text }}
-                            </small>
+                        <label>Profissional</label>
+                        {{ form.profissional }}
+                        {% if form.profissional.errors %}
+                            <div class="text-danger small mt-1">{{ form.profissional.errors }}</div>
                         {% endif %}
-                        
-                        {% for error in field.errors %}
-                            <div class="text-danger small mt-1">
-                                <i class="fas fa-exclamation-triangle me-1"></i>{{ error }}
-                            </div>
-                        {% endfor %}
                     </div>
-                    {% endfor %}
+
+                    <!-- 2. Serviço -->
+                    <div class="mb-4 vip-input-group">
+                        <label>Serviço</label>
+                        {{ form.servico }}
+                    </div>
+
+                    <!-- 3. Data (Input Manual HTML) -->
+                    <div class="mb-4 vip-input-group">
+                        <label>Data do Corte</label>
+                        <input type="date" id="inputData" min="{{ today|date:'Y-m-d' }}">
+                    </div>
+
+                    <!-- 4. Container de Horários (Gerado via JS) -->
+                    <div class="mb-4">
+                        <label class="d-block text-uppercase fw-bold text-muted mb-2" style="font-size: 0.8rem; letter-spacing: 1px; color: #c5a059;">Horários Disponíveis</label>
+                        
+                        <div id="containerHorarios" class="d-flex flex-wrap gap-1">
+                            <span class="text-muted small fst-italic py-2">
+                                <i class="fas fa-arrow-up me-1"></i> Selecione um profissional e uma data acima.
+                            </span>
+                        </div>
+                        <div id="avisoErro" class="text-danger small mt-2 fw-bold"></div>
+                    </div>
 
                     <div class="d-grid gap-3 mt-5">
-                        <button type="submit" class="btn btn-vip btn-lg rounded-pill py-3 shadow-sm">
+                        <!-- Botão começa desativado até escolher horário -->
+                        <button type="submit" id="btnConfirmar" class="btn btn-vip btn-lg rounded-pill py-3 shadow-sm" disabled>
                             Confirmar Agendamento
                         </button>
                         
@@ -144,15 +194,89 @@
 
 {% block extra_scripts %}
 <script>
-    // Garante que os campos do Django (Select, Input) peguem o estilo correto
-    // mesmo que o Django tente renderizar classes padrões.
     document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. Estilização dos Inputs (Seu código original) ---
         const inputs = document.querySelectorAll('.vip-input-group input, .vip-input-group select, .vip-input-group textarea');
         inputs.forEach(input => {
-            // Remove bordas padrões do bootstrap se existirem
             input.classList.remove('form-control'); 
-            input.style.width = "100%"; // Força largura total
+            input.style.width = "100%";
         });
+
+        // --- 2. Lógica de Horários Inteligentes (Nova) ---
+        const selectProfissional = document.getElementById('select-profissional'); 
+        const inputData = document.getElementById('inputData');
+        const containerHorarios = document.getElementById('containerHorarios');
+        const inputHiddenDjango = document.getElementById('id_data_hora_inicio'); 
+        const btnConfirmar = document.getElementById('btnConfirmar');
+        const avisoErro = document.getElementById('avisoErro');
+
+        // Função para buscar horários na API
+        function carregarHorarios() {
+            const profId = selectProfissional.value;
+            const dataVal = inputData.value;
+
+            // Limpa estado anterior
+            containerHorarios.innerHTML = '';
+            avisoErro.textContent = '';
+            btnConfirmar.disabled = true;
+            inputHiddenDjango.value = '';
+
+            if (!profId || !dataVal) return;
+
+            // Mostra loading
+            containerHorarios.innerHTML = '<span class="loading-slots"><i class="fas fa-spinner fa-spin me-2"></i>Verificando disponibilidade...</span>';
+
+            // Chama API
+            fetch(`/agendamento/api/horarios-disponiveis/?profissional_id=${profId}&data=${dataVal}`)
+                .then(response => response.json())
+                .then(data => {
+                    containerHorarios.innerHTML = '';
+
+                    if (data.erro) {
+                        avisoErro.innerHTML = `<i class="fas fa-times-circle me-1"></i> ${data.erro}`;
+                        return;
+                    }
+
+                    if (data.horarios.length === 0) {
+                        avisoErro.innerHTML = '<i class="fas fa-calendar-times me-1"></i> Agenda cheia para este dia.';
+                        return;
+                    }
+
+                    // Cria os botões de horário
+                    data.horarios.forEach(hora => {
+                        const btn = document.createElement('div');
+                        btn.className = 'time-slot-btn';
+                        btn.textContent = hora;
+                        
+                        btn.onclick = function() {
+                            // Remove seleção visual dos outros
+                            document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('selected'));
+                            // Seleciona este
+                            btn.classList.add('selected');
+                            
+                            // Preenche o input oculto que o Django vai salvar
+                            inputHiddenDjango.value = `${dataVal} ${hora}`;
+                            
+                            // Libera o botão de confirmar
+                            btnConfirmar.disabled = false;
+                        };
+
+                        containerHorarios.appendChild(btn);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    containerHorarios.innerHTML = '<span class="text-danger small">Erro de conexão ao buscar horários.</span>';
+                });
+        }
+
+        // Adiciona os ouvintes de evento
+        if(selectProfissional) selectProfissional.addEventListener('change', carregarHorarios);
+        if(inputData) inputData.addEventListener('change', carregarHorarios);
+        
+        // Define data mínima no input date para hoje
+        const today = new Date().toISOString().split('T')[0];
+        if(inputData) inputData.setAttribute('min', today);
     });
 </script>
 {% endblock %}
