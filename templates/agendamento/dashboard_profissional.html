@@ -283,41 +283,63 @@
                 </thead>
                 <tbody>
                     {% for item in agenda_hoje %}
-                    <tr style="border-bottom: 1px solid #f9f9f9;">
-                        <td class="ps-4"><span class="agenda-time">{{ item.data_hora_inicio|date:"H:i" }}</span></td>
+                    <!-- Adicionei uma condição na CLASSE da tr (linha) para ficar cinza se cancelado -->
+                    <tr style="border-bottom: 1px solid #f9f9f9;" class="{% if item.status == 'CANCELADO' %}bg-light text-muted opacity-75{% endif %}">
                         
+                        <!-- Horário -->
+                        <td class="ps-4">
+                            <span class="agenda-time {% if item.status == 'CANCELADO' %}text-decoration-line-through text-muted{% endif %}">
+                                {{ item.data_hora_inicio|date:"H:i" }}
+                            </span>
+                        </td>
+                        
+                        <!-- Cliente -->
                         <td>
                             <div class="d-flex align-items-center">
-                                <!-- Avatar -->
                                 {% if item.cliente.foto %}
-                                    <img src="{{ item.cliente.foto.url }}" class="client-avatar me-3">
+                                    <img src="{{ item.cliente.foto.url }}" class="client-avatar me-3" style="{% if item.status == 'CANCELADO' %}filter: grayscale(100%);{% endif %}">
                                 {% else %}
-                                    <div class="client-avatar-placeholder me-3">{{ item.cliente.username|first|upper }}</div>
+                                    <div class="client-avatar-placeholder me-3" style="{% if item.status == 'CANCELADO' %}background-color: #e9ecef; color: #999;{% endif %}">
+                                        {{ item.cliente.username|first|upper }}
+                                    </div>
                                 {% endif %}
-                                
-                                <!-- Info Cliente + Botão Histórico -->
                                 <div>
-                                    <div class="fw-bold text-dark">
+                                    <div class="fw-bold {% if item.status == 'CANCELADO' %}text-muted{% else %}text-dark{% endif %}">
                                         {{ item.cliente.first_name|default:item.cliente.username }}
-                                        <!-- BOTÃO VER HISTÓRICO -->
-                                        <button class="btn btn-link p-0 ms-2 text-warning" onclick="abrirHistorico('{{ item.cliente.id }}', '{{ item.cliente.first_name }}')" data-bs-toggle="tooltip" title="Ver Prontuário">
-                                            <i class="fas fa-history"></i>
-                                        </button>
+                                        
+                                        <!-- Só mostra botão de histórico se NÃO estiver cancelado -->
+                                        {% if item.status != 'CANCELADO' %}
+                                            <button class="btn btn-link p-0 ms-2 text-warning" onclick="abrirHistorico('{{ item.cliente.id }}', '{{ item.cliente.first_name }}')" data-bs-toggle="tooltip" title="Ver Prontuário">
+                                                <i class="fas fa-history"></i>
+                                            </button>
+                                        {% endif %}
                                     </div>
                                     <div class="small text-muted">
-                                        <i class="fab fa-whatsapp me-1 text-success"></i>
+                                        {% if item.status != 'CANCELADO' %}
+                                            <i class="fab fa-whatsapp me-1 text-success"></i>
+                                        {% endif %}
                                         {{ item.cliente.telefone|default:"--" }}
                                     </div>
                                 </div>
                             </div>
                         </td>
                         
-                        <td><span class="badge bg-light text-dark fw-normal px-3 py-2 rounded-pill border">{{ item.servico.nome }}</span></td>
-                        <td class="fw-medium text-dark">R$ {{ item.servico.preco }}</td>
+                        <!-- Serviço -->
+                        <td>
+                            <span class="badge {% if item.status == 'CANCELADO' %}bg-secondary{% else %}bg-light text-dark border{% endif %} fw-normal px-3 py-2 rounded-pill">
+                                {{ item.servico.nome }}
+                            </span>
+                        </td>
                         
+                        <!-- Valor -->
+                        <td class="fw-medium {% if item.status == 'CANCELADO' %}text-muted text-decoration-line-through{% else %}text-dark{% endif %}">
+                            R$ {{ item.servico.preco }}
+                        </td>
+                        
+                        <!-- Ações / Status -->
                         <td class="text-end pe-4">
                             {% if item.status == 'AGENDADO' %}
-                                <!-- BOTÃO CONCLUIR (Abre Modal) -->
+                                <!-- Botões de Ação Normais -->
                                 <button type="button" class="btn-action btn-action-success" onclick="prepararConclusao('{{ item.id }}', '{{ item.cliente.first_name }}')" data-bs-toggle="tooltip" title="Concluir e Anotar">
                                     <i class="fas fa-check"></i>
                                 </button>
@@ -328,18 +350,32 @@
                                 <a href="{% url 'mudar_status' item.id 'CANCELADO' %}" class="btn-action btn-action-danger" data-bs-toggle="tooltip" title="Cancelar">
                                     <i class="fas fa-times"></i>
                                 </a>
-                            {% else %}
-                                <span class="badge badge-soft 
-                                    {% if item.status == 'CONCLUIDO' %}bg-soft-success
-                                    {% elif item.status == 'NAO_COMPARECEU' %}bg-soft-warning
-                                    {% else %}bg-soft-danger{% endif %}">
-                                    {{ item.get_status_display }}
+
+                            {% elif item.status == 'CANCELADO' %}
+                                <!-- Badge de Cancelado -->
+                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 border border-danger border-opacity-25">
+                                    <i class="fas fa-ban me-1"></i> Cancelado
+                                </span>
+
+                            {% elif item.status == 'CONCLUIDO' %}
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">
+                                    <i class="fas fa-check me-1"></i> Concluído
+                                </span>
+
+                            {% elif item.status == 'NAO_COMPARECEU' %}
+                                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">
+                                    Não Compareceu
                                 </span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="text-center py-5"><p class="text-muted">Nenhum agendamento para hoje.</p></td></tr>
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="text-muted opacity-50 mb-2"><i class="fas fa-coffee fa-3x"></i></div>
+                            <p class="text-muted">Nenhum agendamento para hoje.</p>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -358,24 +394,39 @@
                 <div class="accordion-body px-0">
                     <div class="list-group list-group-flush rounded-3">
                         {% for item in agenda_futura %}
-                        <div class="list-group-item border-0 d-flex justify-content-between align-items-center py-3 px-4 hover-bg-light">
+                        
+                        <!-- Adicionei opacidade se for cancelado -->
+                        <div class="list-group-item border-0 d-flex justify-content-between align-items-center py-3 px-4 hover-bg-light {% if item.status == 'CANCELADO' %}bg-light opacity-50{% endif %}">
+                            
                             <div class="d-flex align-items-center">
+                                <!-- Data Box -->
                                 <div class="bg-light rounded p-2 text-center me-3" style="min-width: 50px;">
                                     <div class="small fw-bold text-uppercase text-muted">{{ item.data_hora_inicio|date:"M" }}</div>
                                     <div class="h5 mb-0 fw-bold text-dark">{{ item.data_hora_inicio|date:"d" }}</div>
                                 </div>
+                                
+                                <!-- Info do Cliente -->
                                 <div>
-                                    <div class="fw-bold">
+                                    <div class="fw-bold {% if item.status == 'CANCELADO' %}text-decoration-line-through text-muted{% endif %}">
                                         {% if item.cliente.first_name %}
                                             {{ item.cliente.first_name }} {{ item.cliente.last_name }}
                                         {% else %}
                                             {{ item.cliente.username }}
                                         {% endif %}
                                     </div>
-                                    <div class="small text-muted">{{ item.servico.nome }} • {{ item.data_hora_inicio|date:"H:i" }}</div>
+                                    <div class="small text-muted">
+                                        {{ item.servico.nome }} • {{ item.data_hora_inicio|date:"H:i" }}
+                                    </div>
                                 </div>
                             </div>
-                            <span class="badge bg-light text-secondary">Futuro</span>
+
+                            <!-- BADGE CONDICIONAL -->
+                            {% if item.status == 'CANCELADO' %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">Cancelado</span>
+                            {% else %}
+                                <span class="badge bg-light text-secondary">Futuro</span>
+                            {% endif %}
+                            
                         </div>
                         {% empty %}
                         <div class="text-center py-3 text-muted small">Nenhum agendamento futuro encontrado.</div>

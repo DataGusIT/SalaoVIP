@@ -164,15 +164,18 @@
                                                 {% endif %}
                                             </td>
                                             
-                                            <td class="pe-3">
-                                                <div class="vip-input-group">
-                                                    <span class="vip-input-icon fw-bold text-success">R$</span>
-                                                    <input type="number" step="0.01" 
-                                                           name="{{ form.preco.html_name }}" 
-                                                           value="{{ form.preco.value|default:'' }}" 
-                                                           class="vip-input" 
-                                                           placeholder="0,00">
+                                            <td>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0">R$</span>
+                                                    <!-- Mudamos para type="text" para evitar conflito de ponto/vírgula -->
+                                                    <input type="text" name="{{ form.preco.html_name }}" 
+                                                        value="{{ form.preco.value|default:'' }}" 
+                                                        class="form-control border-start-0" 
+                                                        placeholder="0.00">
                                                 </div>
+                                                {% if form.preco.errors %}
+                                                    <div class="text-danger small">{{ form.preco.errors }}</div>
+                                                {% endif %}
                                             </td>
                                             
                                             <td class="pe-3">

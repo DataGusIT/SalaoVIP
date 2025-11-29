@@ -23,4 +23,7 @@ urlpatterns = [
     # Rotas de Portfolio
     path('portfolio/upload/', views.upload_foto_portfolio, name='upload_foto_portfolio'),
     path('portfolio/delete/<int:foto_id>/', views.deletar_foto_portfolio, name='deletar_foto_portfolio'),
+
+    path('cancelar/<int:agendamento_id>/', views.cancelar_agendamento, name='cancelar_agendamento'),
+
 ]

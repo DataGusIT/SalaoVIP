@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from datetime import timedelta
+from django.utils import timezone
 
 class Servico(models.Model):
     # Adicionamos o vínculo com o profissional
@@ -150,3 +151,16 @@ class Agendamento(models.Model):
         # Garante o cálculo ao salvar também
         self.data_hora_fim = self.calcular_fim()
         super().save(*args, **kwargs)
+
+    @property
+    def pode_cancelar(self):
+        """
+        Retorna True se faltam mais de 2 horas para o atendimento.
+        Retorna False se faltar menos de 2 horas.
+        """
+        agora = timezone.now()
+        # Se o agendamento é no futuro E a diferença é maior que 2 horas
+        if self.data_hora_inicio > agora:
+            diferenca = self.data_hora_inicio - agora
+            return diferenca > timedelta(hours=2)
+        return False

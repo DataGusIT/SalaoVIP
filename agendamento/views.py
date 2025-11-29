@@ -329,3 +329,23 @@ def deletar_foto_portfolio(request, foto_id):
     foto.delete()
     messages.success(request, "Foto removida.")
     return redirect('editar_perfil')
+
+@login_required
+def cancelar_agendamento(request, agendamento_id):
+    agendamento = get_object_or_404(Agendamento, id=agendamento_id)
+
+    # 1. Verifica se o agendamento pertence ao usuário logado
+    if agendamento.cliente != request.user:
+        messages.error(request, "Você não tem permissão para isso.")
+        return redirect('listar_agendamentos')
+
+    # 2. Regra das 2 horas
+    if not agendamento.pode_cancelar:
+        messages.error(request, "Faltam menos de 2h. Entre em contato com o profissional.")
+        return redirect('listar_agendamentos')
+
+    # 3. Cancela
+    agendamento.status = 'CANCELADO'
+    agendamento.save()
+    messages.success(request, "Agendamento cancelado com sucesso.")
+    return redirect('listar_agendamentos')

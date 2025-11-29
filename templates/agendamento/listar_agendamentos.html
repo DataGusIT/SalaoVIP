@@ -16,7 +16,7 @@
         border: none;
         box-shadow: 0 10px 40px rgba(0,0,0,0.04);
         border-radius: 20px;
-        overflow: hidden; /* Para os cantos da tabela respeitarem o card */
+        overflow: hidden;
     }
 
     /* Cabeçalho do Card */
@@ -74,31 +74,19 @@
         background-color: #fafafa;
     }
 
-    /* Badges de Status Personalizados (Estilo "Pill" Suave) */
+    /* Badges de Status Personalizados */
     .badge-soft {
         padding: 0.5em 1em;
         border-radius: 50px;
         font-weight: 500;
         font-size: 0.75rem;
         letter-spacing: 0.5px;
+        display: inline-block;
     }
 
-    /* Cores dos status */
-    .status-agendado {
-        background-color: rgba(197, 160, 89, 0.1); /* Dourado bem claro */
-        color: #b08d45;
-    }
-    
-    .status-concluido {
-        background-color: rgba(25, 135, 84, 0.1); /* Verde claro */
-        color: #198754;
-    }
-    
-    .status-cancelado {
-        background-color: rgba(220, 53, 69, 0.08); /* Vermelho claro */
-        color: #dc3545;
-        text-decoration: line-through; /* Detalhe sutil */
-    }
+    .status-agendado { background-color: rgba(197, 160, 89, 0.1); color: #b08d45; }
+    .status-concluido { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+    .status-cancelado { background-color: rgba(220, 53, 69, 0.08); color: #dc3545; text-decoration: line-through; }
 
     /* Estado Vazio */
     .empty-state {
@@ -109,6 +97,80 @@
         font-size: 3rem;
         color: #eee;
         margin-bottom: 1rem;
+    }
+
+    /* Botões de Ação na Tabela */
+    .btn-cancel-clean {
+        font-size: 0.75rem;
+        color: #dc3545;
+        text-decoration: none;
+        border: 1px solid #fcebeb;
+        background: #fff;
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .btn-cancel-clean:hover {
+        background: #dc3545;
+        color: #fff;
+        border-color: #dc3545;
+    }
+
+    .btn-help-clean {
+        font-size: 0.75rem;
+        color: #ffc107;
+        text-decoration: none;
+        border: 1px solid #fff3cd;
+        background: #fff;
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        transition: all 0.2s;
+    }
+    .btn-help-clean:hover {
+        background: #ffc107;
+        color: #fff;
+        border-color: #ffc107;
+    }
+
+    /* --- ESTILOS DO MODAL CLEAN --- */
+    .modal-vip .modal-content {
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        padding: 1rem;
+    }
+    .modal-vip .modal-header {
+        border-bottom: none;
+        padding: 1rem 1rem 0 1rem;
+    }
+    .modal-vip .modal-body {
+        padding: 1rem 2rem 2rem 2rem;
+        text-align: center;
+    }
+    .modal-vip .modal-footer {
+        border-top: none;
+        padding: 0 1rem 1rem 1rem;
+        justify-content: center;
+        gap: 10px;
+    }
+    .icon-box-danger {
+        width: 80px;
+        height: 80px;
+        background-color: #fcebeb;
+        color: #dc3545;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem auto;
+        font-size: 2rem;
+        animation: pulse-red 2s infinite;
+    }
+    @keyframes pulse-red {
+        0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
     }
 </style>
 {% endblock %}
@@ -139,26 +201,29 @@
                                 <th>Serviço</th>
                                 <th>Profissional</th>
                                 <th>Data e Hora</th>
-                                <th class="text-center">Status</th>
+                                <th class="text-center">Status / Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for agenda in agendamentos %}
                             <tr>
+                                <!-- Coluna Serviço -->
                                 <td>
                                     <div class="fw-bold">{{ agenda.servico.nome }}</div>
-                                    <small class="text-muted">Duração padrão</small>
+                                    <small class="text-muted">R$ {{ agenda.servico.preco }}</small>
                                 </td>
                                 
+                                <!-- Coluna Profissional -->
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; color: #aaa;">
                                             <i class="fas fa-user-tie"></i>
                                         </div>
-                                        <span>{{ agenda.profissional.username }}</span>
+                                        <span>{{ agenda.profissional.first_name|default:agenda.profissional.username }}</span>
                                     </div>
                                 </td>
                                 
+                                <!-- Coluna Data -->
                                 <td>
                                     <i class="far fa-calendar me-2 text-muted"></i>{{ agenda.data_hora_inicio|date:"d M, Y" }}
                                     <br>
@@ -167,38 +232,78 @@
                                     </small>
                                 </td>
                                 
+                                <!-- Coluna Status e Lógica de Cancelamento -->
                                 <td class="text-center">
                                     {% if agenda.status == 'AGENDADO' %}
-                                        <span class="badge badge-soft status-agendado">
-                                            <i class="fas fa-clock me-1"></i> Agendado
-                                        </span>
+                                        <!-- 1. Status -->
+                                        <div class="mb-2">
+                                            <span class="badge badge-soft status-agendado">
+                                                <i class="fas fa-clock me-1"></i> Agendado
+                                            </span>
+                                        </div>
+
+                                        <!-- 2. Botões de Ação -->
+                                        {% if agenda.pode_cancelar %}
+                                            <!-- Botão que aciona o modal via JS -->
+                                            <button type="button" 
+                                                    class="btn-cancel-clean" 
+                                                    onclick="abrirModalCancelar('{% url 'cancelar_agendamento' agenda.id %}')">
+                                                Cancelar
+                                            </button>
+                                        {% else %}
+                                            <!-- Botão de Ajuda (Urgência) -->
+                                            <button type="button" class="btn-help-clean bg-transparent" data-bs-toggle="modal" data-bs-target="#modalContato{{ agenda.id }}">
+                                                <i class="fas fa-exclamation-circle me-1"></i> Ajuda
+                                            </button>
+                                            
+                                            <!-- MODAL DE AJUDA (Mantido o original para urgência) -->
+                                            <div class="modal fade text-start" id="modalContato{{ agenda.id }}" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content border-0 shadow rounded-4">
+                                                        <div class="modal-header border-0">
+                                                            <h5 class="modal-title fw-bold">Precisa Cancelar?</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body text-center p-4">
+                                                            <div class="mb-3 text-warning opacity-75">
+                                                                <i class="fas fa-hourglass-half fa-3x"></i>
+                                                            </div>
+                                                            <h5 class="fw-bold">Faltam menos de 2 horas!</h5>
+                                                            <p class="text-muted small mb-4">
+                                                                Para não prejudicar a agenda, contate o profissional diretamente.
+                                                            </p>
+                                                            <div class="p-3 bg-light rounded-3">
+                                                                <p class="mb-1 fw-bold">{{ agenda.profissional.first_name }}</p>
+                                                                {% if agenda.profissional.telefone %}
+                                                                    <a href="https://wa.me/55{{ agenda.profissional.telefone|cut:' '|cut:'-'|cut:'('|cut:')' }}" target="_blank" class="btn btn-success rounded-pill w-100 mt-2 shadow-sm">
+                                                                        <i class="fab fa-whatsapp me-2"></i> WhatsApp
+                                                                    </a>
+                                                                {% else %}
+                                                                    <p class="mb-0 text-muted small">Sem telefone cadastrado.</p>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
                                     {% elif agenda.status == 'CONCLUIDO' %}
-                                        <span class="badge badge-soft status-concluido">
-                                            Concluído
-                                        </span>
+                                        <span class="badge badge-soft status-concluido">Concluído</span>
                                     {% elif agenda.status == 'CANCELADO' %}
-                                        <span class="badge badge-soft status-cancelado">
-                                            Cancelado
-                                        </span>
+                                        <span class="badge badge-soft status-cancelado">Cancelado</span>
                                     {% else %}
-                                        <span class="badge bg-light text-dark">
-                                            {{ agenda.get_status_display }}
-                                        </span>
+                                        <span class="badge bg-light text-dark">{{ agenda.get_status_display }}</span>
                                     {% endif %}
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4">
+                                <td colspan="4" class="text-center py-5">
                                     <div class="empty-state">
-                                        <div class="empty-icon">
-                                            <i class="far fa-calendar-alt"></i>
-                                        </div>
+                                        <div class="empty-icon"><i class="far fa-calendar-alt"></i></div>
                                         <h5 class="fw-light text-muted">Nenhum agendamento encontrado</h5>
-                                        <p class="small text-muted mb-4">Seu histórico está vazio. Que tal marcar algo novo?</p>
-                                        <a href="{% url 'novo_agendamento' %}" class="btn btn-outline-vip rounded-pill">
-                                            Agendar Primeiro Horário
-                                        </a>
+                                        <a href="{% url 'novo_agendamento' %}" class="btn btn-outline-vip rounded-pill mt-3">Agendar</a>
                                     </div>
                                 </td>
                             </tr>
@@ -207,8 +312,55 @@
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
+
+<!-- ========================================== -->
+<!-- MODAL DE CONFIRMAÇÃO DE CANCELAMENTO (ÚNICO) -->
+<!-- ========================================== -->
+<div class="modal fade modal-vip" id="modalConfirmarCancelamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="icon-box-danger">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+                <h4 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;">Cancelar Agendamento?</h4>
+                <p class="text-muted mb-0">
+                    Tem certeza que deseja desmarcar este horário? <br>
+                    <small>Essa ação não poderá ser desfeita.</small>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Não, manter</button>
+                <!-- O href deste botão será injetado via JavaScript -->
+                <a href="#" id="btnConfirmarExclusao" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                    Sim, cancelar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Função para abrir o modal e configurar o link de cancelamento
+    function abrirModalCancelar(urlCancelamento) {
+        // 1. Encontra o botão "Sim, cancelar" dentro do modal
+        var btnConfirmar = document.getElementById('btnConfirmarExclusao');
+        
+        // 2. Atualiza o link desse botão com a URL específica do agendamento clicado
+        btnConfirmar.href = urlCancelamento;
+        
+        // 3. Abre o modal usando a API do Bootstrap 5
+        var modalElement = document.getElementById('modalConfirmarCancelamento');
+        var modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
+</script>
 {% endblock %}
