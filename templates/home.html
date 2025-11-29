@@ -4,7 +4,7 @@
 
 {% block extra_head %}
 <style>
-    /* --- HERO SECTION (Mantida) --- */
+    /* --- HERO SECTION --- */
     .hero-section {
         background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
         color: #fff;
@@ -14,7 +14,6 @@
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(0,0,0,0.2);
     }
-
     .hero-section::before {
         content: '';
         position: absolute;
@@ -26,11 +25,10 @@
         border-radius: 50%;
         z-index: 0;
     }
-
     .hero-content { position: relative; z-index: 1; }
     .text-gold { color: #c5a059; }
 
-    /* --- CARDS DE DESTAQUE --- */
+    /* --- FEATURES --- */
     .feature-card {
         border: none;
         background: #fff;
@@ -40,189 +38,82 @@
         height: 100%;
         border: 1px solid rgba(0,0,0,0.02);
     }
-
     .feature-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 15px 30px rgba(0,0,0,0.06);
         border-color: transparent;
     }
-
     .icon-box {
-        width: 64px;
-        height: 64px;
-        background-color: #fcfcfc;
-        color: #c5a059;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 16px;
-        font-size: 1.6rem;
-        margin-bottom: 1.5rem;
+        width: 64px; height: 64px; background-color: #fcfcfc; color: #c5a059;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 16px; font-size: 1.6rem; margin-bottom: 1.5rem;
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
 
     /* --- CARDS DE PROFISSIONAIS --- */
     .pro-card {
-        border: none;
-        background: #fff;
-        border-radius: 24px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
-        height: 100%;
-        position: relative;
+        border: none; background: #fff; border-radius: 24px; overflow: hidden;
+        transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        height: 100%; position: relative;
     }
-
-    .pro-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-    }
+    .pro-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
 
     .pro-cover {
         height: 140px;
         background: linear-gradient(45deg, #333, #1a1a1a);
-        background-size: cover;
-        background-position: center;
-        position: relative;
+        background-size: cover; background-position: center; position: relative;
     }
-    
     .pro-cover::after {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
+        content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
         background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
     }
 
     .pro-avatar {
-        width: 110px;
-        height: 110px;
-        object-fit: cover;
-        border-radius: 50%;
-        border: 4px solid #fff;
-        margin-top: -60px;
-        background: #fff;
-        position: relative;
-        z-index: 2;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        transition: transform 0.3s;
+        width: 110px; height: 110px; object-fit: cover;
+        border-radius: 50%; border: 4px solid #fff; margin-top: -60px;
+        background: #fff; position: relative; z-index: 2;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.3s;
     }
-    
-    .pro-card:hover .pro-avatar {
-        transform: scale(1.05);
-        border-color: #c5a059;
-    }
+    .pro-card:hover .pro-avatar { transform: scale(1.05); border-color: #c5a059; }
 
     .pro-info { padding: 1rem 1.5rem 1.5rem 1.5rem; }
-
+    
     .pro-name {
-        font-family: 'Outfit', sans-serif;
-        font-weight: 700;
-        font-size: 1.2rem;
-        color: #1a1a1a;
-        margin-bottom: 0.2rem;
-    }
-
-    .pro-role {
-        color: #c5a059;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 600;
-        margin-bottom: 1.2rem;
-    }
-
-    .pro-gallery img {
-        width: 50px;
-        height: 50px;
-        object-fit: cover;
-        border-radius: 10px;
-        border: 2px solid #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        transition: transform 0.2s;
-        cursor: pointer;
-    }
-    .pro-gallery img:hover { 
-        transform: scale(1.1); 
-        z-index: 5; 
-        border-color: #c5a059;
-    }
-
-    .btn-card-action {
-        width: 100%;
-        border-radius: 12px;
-        padding: 0.6rem;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-
-    /* --- ESTILO DO MODAL DE ZOOM E NAVEGAÇÃO --- */
-    #modalZoom .modal-content {
-        background-color: transparent;
-        border: none;
-        box-shadow: none;
-        position: relative; /* Para posicionar as setas */
+        font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.2rem;
+        color: #1a1a1a; margin-bottom: 0.2rem;
     }
     
+    /* TAGS DE SERVIÇOS (NOVO CSS) */
+    .service-tags {
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 1rem; min-height: 30px;
+    }
+    .tag-item {
+        font-size: 0.7rem; padding: 3px 10px; border-radius: 50px;
+        background: #f8f9fa; border: 1px solid #eee; color: #666;
+        white-space: nowrap;
+    }
+
+    /* Galeria e Botão */
+    .pro-gallery img {
+        width: 50px; height: 50px; object-fit: cover;
+        border-radius: 10px; border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer;
+    }
+    .pro-gallery img:hover { transform: scale(1.1); z-index: 5; border-color: #c5a059; }
+
+    .btn-card-action { width: 100%; border-radius: 12px; padding: 0.6rem; font-weight: 500; transition: all 0.2s; }
+
+    /* Modal Zoom (Mesmo CSS anterior) */
+    #modalZoom .modal-content { background-color: transparent; border: none; box-shadow: none; position: relative; }
     #modalZoom .modal-backdrop.show { opacity: 0.9; }
-
-    #imgZoom {
-        max-height: 85vh;
-        width: auto;
-        max-width: 100%;
-        border-radius: 12px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        object-fit: contain;
-    }
-
-    .btn-close-zoom {
-        position: absolute;
-        top: -40px;
-        right: 0;
-        color: #fff;
-        background: transparent;
-        border: none;
-        font-size: 2rem;
-        opacity: 0.7;
-        transition: opacity 0.3s;
-        z-index: 1060;
-    }
+    #imgZoom { max-height: 85vh; width: auto; max-width: 100%; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: contain; }
+    .btn-close-zoom { position: absolute; top: -40px; right: 0; color: #fff; background: transparent; border: none; font-size: 2rem; opacity: 0.7; z-index: 1060; }
     .btn-close-zoom:hover { opacity: 1; transform: scale(1.1); }
-
-    /* Estilo das Setas de Navegação */
-    .modal-nav-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.2);
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        font-size: 1.2rem;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(5px);
-        z-index: 1055;
-    }
-
-    .modal-nav-btn:hover {
-        background: rgba(197, 160, 89, 0.9); /* Dourado no hover */
-        border-color: #c5a059;
-        transform: translateY(-50%) scale(1.1);
-    }
-
-    .modal-nav-prev { left: -60px; } /* Posiciona fora da imagem */
+    .modal-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255,255,255,0.2); width: 50px; height: 50px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); z-index: 1055; }
+    .modal-nav-btn:hover { background: rgba(197, 160, 89, 0.9); border-color: #c5a059; transform: translateY(-50%) scale(1.1); }
+    .modal-nav-prev { left: -60px; }
     .modal-nav-next { right: -60px; }
-
-    /* Ajuste para mobile: setas em cima da imagem */
-    @media (max-width: 768px) {
-        .modal-nav-prev { left: 10px; }
-        .modal-nav-next { right: 10px; }
-    }
+    @media (max-width: 768px) { .modal-nav-prev { left: 10px; } .modal-nav-next { right: 10px; } }
 </style>
 {% endblock %}
 
@@ -245,23 +136,14 @@
             
             <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
                 {% if not user.is_authenticated %}
-                    <a class="btn btn-vip btn-lg px-5" href="{% url 'login' %}">
-                        Entrar para Agendar
-                    </a>
-                    <a class="btn btn-outline-light btn-lg px-5 rounded-pill" href="{% url 'registro' %}">
-                        Criar Conta
-                    </a>
+                    <a class="btn btn-vip btn-lg px-5" href="{% url 'login' %}">Entrar para Agendar</a>
+                    <a class="btn btn-outline-light btn-lg px-5 rounded-pill" href="{% url 'registro' %}">Criar Conta</a>
                 {% else %}
-                    <a class="btn btn-vip btn-lg px-5" href="{% url 'novo_agendamento' %}">
-                        <i class="fas fa-calendar-plus me-2"></i>Agendar Agora
-                    </a>
-                    <a class="btn btn-outline-light btn-lg px-4 rounded-pill" href="{% url 'listar_agendamentos' %}">
-                        Meus Horários
-                    </a>
+                    <a class="btn btn-vip btn-lg px-5" href="{% url 'novo_agendamento' %}">Agendar Agora</a>
+                    <a class="btn btn-outline-light btn-lg px-4 rounded-pill" href="{% url 'listar_agendamentos' %}">Meus Horários</a>
                 {% endif %}
             </div>
         </div>
-        
         <div class="col-lg-5 d-none d-lg-block text-center hero-content">
             <i class="fas fa-cut" style="font-size: 12rem; color: rgba(255,255,255,0.03); transform: rotate(-45deg);"></i>
         </div>
@@ -272,27 +154,21 @@
 <div class="row g-4 mb-5">
     <div class="col-md-4">
         <div class="feature-card text-center text-md-start">
-            <div class="icon-box mx-auto mx-md-0">
-                <i class="fas fa-star"></i>
-            </div>
+            <div class="icon-box mx-auto mx-md-0"><i class="fas fa-star"></i></div>
             <h4 class="h5 fw-bold">Profissionais Elite</h4>
             <p class="text-muted small">Equipe selecionada rigorosamente, especialistas em visagismo e tendências.</p>
         </div>
     </div>
     <div class="col-md-4">
         <div class="feature-card text-center text-md-start">
-            <div class="icon-box mx-auto mx-md-0">
-                <i class="fas fa-stopwatch"></i>
-            </div>
+            <div class="icon-box mx-auto mx-md-0"><i class="fas fa-stopwatch"></i></div>
             <h4 class="h5 fw-bold">Pontualidade VIP</h4>
             <p class="text-muted small">Respeitamos seu tempo. Atendimento pontual e sem filas de espera.</p>
         </div>
     </div>
     <div class="col-md-4">
         <div class="feature-card text-center text-md-start">
-            <div class="icon-box mx-auto mx-md-0">
-                <i class="fas fa-smartphone"></i>
-            </div>
+            <div class="icon-box mx-auto mx-md-0"><i class="fas fa-smartphone"></i></div>
             <h4 class="h5 fw-bold">100% Digital</h4>
             <p class="text-muted small">Controle total na palma da mão. Agende, remarque e avalie pelo app.</p>
         </div>
@@ -329,11 +205,20 @@
 
                 <div class="pro-info">
                     <h5 class="pro-name">{{ prof.first_name }} {{ prof.last_name }}</h5>
-                    <div class="pro-role">Cabeleireiro VIP</div>
+                    <div class="pro-role mb-2 text-gold small fw-bold">CABELEIREIRO VIP</div>
                     
-                    <!-- Portfolio Preview COM NAVEGAÇÃO -->
+                    <!-- LISTA DE SERVIÇOS (NOVO!) -->
+                    <div class="service-tags">
+                        {% for servico in prof.servicos.all|slice:":3" %}
+                            <span class="tag-item">{{ servico.nome }}</span>
+                        {% empty %}
+                            <span class="text-muted small fst-italic">Serviços não listados</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Portfolio Preview -->
                     {% if prof.portfolio.all %}
-                    <div class="pro-gallery d-flex justify-content-center gap-2 mb-4">
+                    <div class="pro-gallery d-flex justify-content-center gap-2 mb-4 mt-3">
                         {% with fotos=prof.portfolio.all|slice:":3" %}
                             {% for item in fotos %}
                                 <img src="{{ item.imagem.url }}" 
@@ -344,7 +229,7 @@
                         {% endwith %}
                     </div>
                     {% else %}
-                    <div class="mb-4 text-muted small py-2 fst-italic opacity-50">
+                    <div class="mb-4 text-muted small py-2 fst-italic opacity-50 mt-3">
                         Visualizando portfólio...
                     </div>
                     {% endif %}
@@ -371,31 +256,16 @@
     </div>
 </div>
 
-<!-- MODAL DE ZOOM COM NAVEGAÇÃO -->
+<!-- MODAL ZOOM (Igual ao anterior) -->
 <div class="modal fade" id="modalZoom" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content text-center position-relative d-flex justify-content-center align-items-center">
-            
             <div class="modal-body p-0 position-relative d-inline-block">
-                <!-- Botão Fechar -->
-                <button type="button" class="btn-close-zoom" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-
-                <!-- Botão Anterior -->
-                <button class="modal-nav-btn modal-nav-prev" onclick="navegarFoto(-1)">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-
-                <!-- Imagem -->
+                <button type="button" class="btn-close-zoom" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i></button>
+                <button class="modal-nav-btn modal-nav-prev" onclick="navegarFoto(-1)"><i class="fas fa-chevron-left"></i></button>
                 <img src="" id="imgZoom" alt="Zoom Foto">
-
-                <!-- Botão Próximo -->
-                <button class="modal-nav-btn modal-nav-next" onclick="navegarFoto(1)">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+                <button class="modal-nav-btn modal-nav-next" onclick="navegarFoto(1)"><i class="fas fa-chevron-right"></i></button>
             </div>
-
         </div>
     </div>
 </div>
@@ -404,41 +274,28 @@
 
 {% block extra_scripts %}
 <script>
-    // Variáveis globais para controlar a navegação
+    // Variáveis e Funções da Galeria (Mesmo script do anterior)
     let imagensAtuais = [];
     let indiceAtual = 0;
 
-    // Função chamada ao clicar na miniatura
     function abrirGaleria(index, listaImagens) {
         indiceAtual = index;
-        imagensAtuais = listaImagens; // Recebe a lista de URLs daquele profissional
-        
+        imagensAtuais = listaImagens;
         atualizarModalImagem();
-        
         var modal = new bootstrap.Modal(document.getElementById('modalZoom'));
         modal.show();
     }
 
-    // Função chamada pelas setas
     function navegarFoto(direcao) {
         indiceAtual += direcao;
-
-        // Loop infinito: se passar do fim, volta pro começo e vice-versa
-        if (indiceAtual >= imagensAtuais.length) {
-            indiceAtual = 0;
-        } else if (indiceAtual < 0) {
-            indiceAtual = imagensAtuais.length - 1;
-        }
-
+        if (indiceAtual >= imagensAtuais.length) indiceAtual = 0;
+        else if (indiceAtual < 0) indiceAtual = imagensAtuais.length - 1;
         atualizarModalImagem();
     }
 
-    // Atualiza o src da imagem no modal
     function atualizarModalImagem() {
         var imgElement = document.getElementById('imgZoom');
         imgElement.src = imagensAtuais[indiceAtual];
-        
-        // Esconde as setas se tiver só 1 foto
         if(imagensAtuais.length <= 1) {
             document.querySelectorAll('.modal-nav-btn').forEach(btn => btn.style.display = 'none');
         } else {

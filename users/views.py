@@ -9,8 +9,10 @@ from agendamento.models import Portfolio
 from .models import User
 
 def home(request):
-    # Busca apenas quem é cabeleireiro para mostrar na vitrine
-    profissionais = User.objects.filter(tipo='CABELEIREIRO')
+    # prefetch_related('servicos', 'portfolio') faz uma mágica de performance:
+    # carrega tudo em apenas 2 ou 3 consultas ao banco, em vez de 1 consulta por cabeleireiro.
+    profissionais = User.objects.filter(tipo='CABELEIREIRO').prefetch_related('servicos', 'portfolio')
+    
     return render(request, 'home.html', {'profissionais': profissionais})
 
 def registro(request):
