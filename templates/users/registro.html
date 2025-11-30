@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Criar Conta | Salão VIP{% endblock %}
 
 {% block extra_head %}
 <style>
-    /* Reutilizando a estrutura do Login para consistência */
+    /* --- ESTRUTURA GERAL (MANTIDA) --- */
     .register-wrapper {
         min-height: 85vh;
         display: flex;
@@ -27,7 +28,14 @@
         color: #1a1a1a;
     }
 
-    /* Estilização dos Labels */
+    .register-logo {
+        height: 100px;
+        width: auto;
+        object-fit: contain;
+        margin-bottom: 1rem;
+        mix-blend-mode: multiply;
+    }
+
     .form-label-custom {
         font-size: 0.85rem;
         font-weight: 500;
@@ -36,7 +44,7 @@
         margin-left: 0.2rem;
     }
 
-    /* Estilização Profunda dos Inputs do Django */
+    /* --- INPUTS ESTILIZADOS --- */
     .custom-field input, 
     .custom-field select, 
     .custom-field textarea {
@@ -50,41 +58,114 @@
         background-color: #fbfbfb;
         border: 1px solid #eee;
         border-radius: 12px;
-        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        transition: all 0.3s ease;
     }
 
-    .custom-field input:focus,
-    .custom-field select:focus {
+    .custom-field input:focus {
         background-color: #fff;
         border-color: #c5a059;
         outline: 0;
-        box-shadow: 0 0 0 0.25rem rgba(197, 160, 89, 0.1);
+        box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
     }
 
-    /* Textos de ajuda e erro */
-    .help-text {
+    /* Estados de Validação Customizados */
+    .custom-field input.is-valid-custom {
+        border-color: #198754 !important;
+        background-color: #f8fffb !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .custom-field input.is-invalid-custom {
+        border-color: #dc3545 !important;
+        background-color: #fff8f8 !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linecap='round' d='M6 3.5v3M6 8.5h.01'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    /* --- NOVO MEDIDOR DE FORÇA (SEGMENTADO) --- */
+    .password-strength-area {
+        display: none; /* Oculto inicialmente */
+        margin-top: 8px;
+    }
+
+    .strength-bars {
+        display: flex;
+        gap: 4px; /* Espaço entre segmentos */
+        height: 4px;
+        margin-bottom: 4px;
+    }
+
+    .strength-segment {
+        flex: 1;
+        background-color: #e9ecef;
+        border-radius: 2px;
+        transition: background-color 0.3s ease;
+    }
+
+    .strength-label {
         font-size: 0.75rem;
-        color: #999;
-        margin-top: 0.25rem;
-    }
-    
-    .error-list {
-        list-style: none;
-        padding: 0;
-        margin-top: 5px;
-        color: #dc3545;
-        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: right;
+        transition: color 0.3s ease;
     }
 
-    .link-gold {
-        color: #c5a059;
-        text-decoration: none;
+    /* Classes de Força */
+    .strength-1 .seg-1 { background-color: #dc3545; } /* Fraca (Vermelho) */
+    
+    .strength-2 .seg-1, 
+    .strength-2 .seg-2 { background-color: #ffc107; } /* Média (Amarelo) */
+    
+    .strength-3 .seg-1, 
+    .strength-3 .seg-2, 
+    .strength-3 .seg-3 { background-color: #0dcaf0; } /* Boa (Azul) */
+    
+    .strength-4 .seg-1, 
+    .strength-4 .seg-2, 
+    .strength-4 .seg-3, 
+    .strength-4 .seg-4 { background-color: #198754; } /* Forte (Verde) */
+
+    /* Cores do Texto */
+    .text-weak { color: #dc3545; }
+    .text-medium { color: #ffc107; }
+    .text-good { color: #0dcaf0; }
+    .text-strong { color: #198754; }
+
+    /* --- MENSAGEM DE COINCIDÊNCIA --- */
+    .match-message {
+        font-size: 0.8rem;
+        margin-top: 6px;
         font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
-    .link-gold:hover {
-        text-decoration: underline;
-        color: #b08d45;
-    }
+    .match-message.error { color: #dc3545; }
+    .match-message.success { color: #198754; }
+
+    /* Outros Estilos (Botões, etc) */
+    .help-text { font-size: 0.75rem; color: #999; margin-top: 0.25rem; }
+    .error-list { list-style: none; padding: 0; margin-top: 5px; color: #dc3545; font-size: 0.85rem; }
+    .link-gold { color: #c5a059; text-decoration: none; font-weight: 500; }
+    .link-gold:hover { text-decoration: underline; color: #b08d45; }
+    
+    .divider { display: flex; align-items: center; text-align: center; margin: 1.5rem 0; color: #ccc; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #f0f0f0; }
+    .divider::before { margin-right: 1em; } .divider::after { margin-left: 1em; }
+
+    .btn-google { background-color: #fff; color: #1a1a1a; border: 1px solid #e0e0e0; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 12px; transition: all 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.02); text-decoration: none; }
+    .btn-google:hover { background-color: #fff; border-color: #c5a059; color: #c5a059; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.15); transform: translateY(-2px); }
+    .google-icon { width: 20px; height: 20px; transition: transform 0.3s; }
+    .btn-google:hover .google-icon { transform: scale(1.15); }
+
+    /* Botão Loading */
+    .btn-loading { position: relative; color: transparent !important; pointer-events: none; }
+    .btn-loading::after { content: ''; position: absolute; width: 1.2rem; height: 1.2rem; top: 50%; left: 50%; margin-top: -0.6rem; margin-left: -0.6rem; border: 2px solid #fff; border-radius: 50%; border-right-color: transparent; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 {% endblock %}
 
@@ -95,25 +176,44 @@
         <div class="card card-clean p-4 p-md-5">
             
             <div class="text-center mb-5">
-                <div class="mb-3">
-                    <i class="fas fa-user-plus fa-2x" style="color: #c5a059;"></i>
+                <div class="mb-2">
+                    <img src="{% static 'images/logo.png' %}" alt="Salão VIP" class="register-logo">
                 </div>
                 <h3 class="register-title">Junte-se ao Clube</h3>
                 <p class="text-muted small">Crie sua conta para agendamentos exclusivos</p>
             </div>
 
-            <form method="post">
+            <form method="post" id="registerForm">
                 {% csrf_token %}
                 
                 {% for field in form %}
                 <div class="mb-4 custom-field">
-                    <label class="form-label-custom">
-                        {{ field.label }}
-                    </label>
-                    
+                    <label class="form-label-custom">{{ field.label }}</label>
                     {{ field }}
-                    
-                    {% if field.help_text %}
+
+                    <!-- 1. Medidor de Força (Apenas para o campo de senha principal) -->
+                    {% if field.name == 'password1' or field.label == 'Senha' %}
+                        <div class="password-strength-area" id="strengthArea">
+                            <!-- Barras Segmentadas -->
+                            <div class="strength-bars" id="strengthBars">
+                                <div class="strength-segment seg-1"></div>
+                                <div class="strength-segment seg-2"></div>
+                                <div class="strength-segment seg-3"></div>
+                                <div class="strength-segment seg-4"></div>
+                            </div>
+                            <!-- Legenda de Texto -->
+                            <div class="strength-label" id="strengthLabel">Fraca</div>
+                        </div>
+                    {% endif %}
+
+                    <!-- 2. Feedback de Confirmação (Apenas para o campo de confirmação) -->
+                    {% if field.name == 'password2' or 'Confirmação' in field.label %}
+                        <div id="matchFeedback" class="match-message" style="display: none;"></div>
+                    {% endif %}
+
+                    <!-- 3. Help Text (Filtrado) -->
+                    <!-- Exibe help text SOMENTE se NÃO for campo de senha -->
+                    {% if field.help_text and not "password" in field.name and field.label != 'Senha' %}
                         <div class="help-text">
                             <i class="fas fa-info-circle me-1"></i>{{ field.help_text|safe }}
                         </div>
@@ -129,12 +229,21 @@
                 </div>
                 {% endfor %}
 
-                <div class="d-grid mt-5 mb-4">
-                    <button type="submit" class="btn btn-vip btn-lg rounded-pill py-3 shadow-sm">
+                <div class="d-grid mt-5 mb-3">
+                    <button type="submit" id="btnSubmit" class="btn btn-vip btn-lg rounded-pill py-3 shadow-sm">
                         Criar minha conta
                     </button>
                 </div>
             </form>
+
+            <div class="divider">ou cadastrar com</div>
+
+            <div class="d-grid mb-4 mt-3">
+                <a href="#" class="btn btn-lg rounded-pill py-2 btn-google">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" class="google-icon" alt="G">
+                    Google
+                </a>
+            </div>
 
             <div class="text-center pt-3 border-top">
                 <span class="text-muted small">Já é membro?</span>
@@ -149,15 +258,103 @@
 
 {% block extra_scripts %}
 <script>
-    // Script JS para garantir que os campos do Django ganhem a classe correta
-    // caso eles venham "crus" do backend.
     document.addEventListener("DOMContentLoaded", function() {
-        var inputs = document.querySelectorAll('.custom-field input, .custom-field select');
+        // Inicialização de estilos
+        const inputs = document.querySelectorAll('.custom-field input, .custom-field select');
         inputs.forEach(function(input) {
-            // Remove classes antigas do bootstrap se existirem para aplicar nosso CSS limpo
             input.classList.remove('form-control');
-            // O estilo é aplicado via CSS global usando a classe do pai (.custom-field input)
+            // Remove autocomplete agressivo
+            if (input.type !== 'password') input.setAttribute('autocomplete', 'off');
         });
+
+        // Elementos
+        const pass1 = document.querySelector('input[name="password1"]') || document.querySelector('input[type="password"]');
+        // Tenta achar o segundo password (confirmação)
+        const allPass = document.querySelectorAll('input[type="password"]');
+        const pass2 = allPass.length > 1 ? allPass[1] : null;
+
+        const strengthArea = document.getElementById('strengthArea');
+        const strengthBars = document.getElementById('strengthBars');
+        const strengthLabel = document.getElementById('strengthLabel');
+        const matchFeedback = document.getElementById('matchFeedback');
+
+        if (pass1) {
+            pass1.addEventListener('input', function() {
+                const val = pass1.value;
+                
+                if (val.length > 0) {
+                    strengthArea.style.display = 'block';
+                } else {
+                    strengthArea.style.display = 'none';
+                    return;
+                }
+
+                // Cálculo simples de força
+                let score = 0;
+                if (val.length >= 6) score++;
+                if (val.length >= 10) score++;
+                if (/[A-Z]/.test(val)) score++;
+                if (/[0-9]/.test(val)) score++;
+                if (/[^A-Za-z0-9]/.test(val)) score++;
+
+                // Define classes e texto baseado no score (0 a 5)
+                strengthBars.className = 'strength-bars'; // Reset
+                strengthLabel.className = 'strength-label'; // Reset
+
+                if (val.length < 6) {
+                    strengthBars.classList.add('strength-1');
+                    strengthLabel.textContent = 'Muito Curta';
+                    strengthLabel.classList.add('text-weak');
+                } else if (score <= 2) {
+                    strengthBars.classList.add('strength-2');
+                    strengthLabel.textContent = 'Fraca';
+                    strengthLabel.classList.add('text-medium');
+                } else if (score <= 3) {
+                    strengthBars.classList.add('strength-3');
+                    strengthLabel.textContent = 'Boa';
+                    strengthLabel.classList.add('text-good');
+                } else {
+                    strengthBars.classList.add('strength-4');
+                    strengthLabel.textContent = 'Forte';
+                    strengthLabel.classList.add('text-strong');
+                }
+
+                // Revalida match se pass2 já tiver valor
+                if (pass2 && pass2.value.length > 0) checkMatch();
+            });
+        }
+
+        if (pass2) {
+            function checkMatch() {
+                matchFeedback.style.display = 'block';
+                
+                if (pass1.value === pass2.value && pass1.value !== '') {
+                    matchFeedback.innerHTML = '<i class="fas fa-check-circle"></i> As senhas coincidem';
+                    matchFeedback.className = 'match-message success';
+                    
+                    pass2.classList.add('is-valid-custom');
+                    pass2.classList.remove('is-invalid-custom');
+                } else {
+                    matchFeedback.innerHTML = '<i class="fas fa-times-circle"></i> As senhas não coincidem';
+                    matchFeedback.className = 'match-message error';
+                    
+                    pass2.classList.add('is-invalid-custom');
+                    pass2.classList.remove('is-valid-custom');
+                }
+            }
+
+            pass2.addEventListener('input', checkMatch);
+        }
+
+        // Loading no Submit
+        const form = document.getElementById('registerForm');
+        const btnSubmit = document.getElementById('btnSubmit');
+        if (form && btnSubmit) {
+            form.addEventListener('submit', function() {
+                btnSubmit.classList.add('btn-loading');
+                setTimeout(() => { btnSubmit.disabled = true; }, 50);
+            });
+        }
     });
 </script>
 {% endblock %}

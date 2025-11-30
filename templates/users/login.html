@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Entrar | Salão VIP{% endblock %}
 
@@ -10,6 +11,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 2rem 0;
     }
 
     /* O Card Minimalista */
@@ -31,7 +33,7 @@
     .form-floating > .form-control:focus {
         background-color: #fff;
         border-color: #c5a059;
-        box-shadow: none; /* Remove o glow padrão do bootstrap para ficar flat */
+        box-shadow: none; 
     }
     
     .form-floating > label {
@@ -58,6 +60,85 @@
         text-decoration: underline;
         color: #b08d45;
     }
+
+    /* Logo no Login */
+    .login-logo {
+        height: 100px;
+        width: auto;
+        object-fit: contain;
+        margin-bottom: 1rem;
+        mix-blend-mode: multiply; /* Remove fundo branco se houver */
+    }
+
+    /* Botão de Olho (Ver Senha) */
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #aaa;
+        z-index: 10;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+    .password-toggle:hover { color: #c5a059; }
+
+    /* Divisor "OU" */
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 1.5rem 0;
+        color: #ccc;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 600;
+    }
+    .divider::before, .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .divider::before { margin-right: 1em; }
+    .divider::after { margin-left: 1em; }
+
+    /* Botão Google VIP */
+    .btn-google {
+        background-color: #fff;
+        color: #1a1a1a;
+        border: 1px solid #e0e0e0;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-google:hover {
+        background-color: #fff;
+        border-color: #c5a059; /* Borda Dourada */
+        color: #c5a059; /* Texto Dourado */
+        box-shadow: 0 8px 20px rgba(197, 160, 89, 0.15); /* Sombra Dourada Suave */
+        transform: translateY(-2px);
+    }
+    
+    .google-icon { 
+        width: 20px; 
+        height: 20px; 
+        transition: transform 0.3s; 
+    }
+    
+    .btn-google:hover .google-icon {
+        transform: scale(1.15); /* Leve zoom no ícone */
+    }
 </style>
 {% endblock %}
 
@@ -67,9 +148,10 @@
         
         <div class="card card-clean p-4 p-md-5">
             
-            <div class="text-center mb-5">
-                <div class="mb-3">
-                    <i class="fas fa-scissors fa-2x" style="color: #c5a059;"></i>
+            <div class="text-center mb-4">
+                <div class="mb-2">
+                    <!-- LOGO AQUI (Substitui a tesoura) -->
+                    <img src="{% static 'images/logo.png' %}" alt="Salão VIP" class="login-logo">
                 </div>
                 <h3 class="login-title">Acesse sua conta</h3>
                 <p class="text-muted small">Gerencie seu estilo com exclusividade</p>
@@ -83,25 +165,62 @@
                     <label for="id_username">Nome de usuário</label>
                 </div>
                 
-                <div class="form-floating mb-4">
-                    <input type="password" name="password" class="form-control" id="id_password" placeholder="Senha" required>
-                    <label for="id_password">Sua senha</label>
+                <div class="position-relative mb-4">
+                    <div class="form-floating">
+                        <input type="password" name="password" class="form-control" id="id_password" placeholder="Senha" required>
+                        <label for="id_password">Sua senha</label>
+                    </div>
+                    <!-- Ícone de Olho -->
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <i class="far fa-eye" id="toggleIcon"></i>
+                    </button>
                 </div>
 
-                <div class="d-grid mb-4">
+                <div class="d-grid mb-3">
                     <button type="submit" class="btn btn-vip btn-lg rounded-pill py-3 shadow-sm">
                         Entrar
                     </button>
                 </div>
-
-                <div class="text-center">
-                    <span class="text-muted small">Ainda não é membro?</span>
-                    <br>
-                    <a href="{% url 'registro' %}" class="register-link mt-1 d-inline-block">Criar conta gratuita</a>
-                </div>
             </form>
+
+            <!-- Divisor e Botão Google -->
+            <div class="divider">ou entrar com</div>
+
+            <div class="d-grid mb-4 mt-3">
+                <!-- Link temporário '#' para evitar erro de rota inexistente -->
+                <a href="#" class="btn btn-lg rounded-pill py-2 btn-google">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" class="google-icon" alt="G">
+                    Google
+                </a>
+            </div>
+
+            <div class="text-center">
+                <span class="text-muted small">Ainda não é membro?</span>
+                <br>
+                <a href="{% url 'registro' %}" class="register-link mt-1 d-inline-block">Criar conta gratuita</a>
+            </div>
+            
         </div>
 
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('id_password');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+</script>
 {% endblock %}
