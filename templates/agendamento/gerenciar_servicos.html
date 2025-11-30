@@ -6,7 +6,7 @@
 <style>
     .services-wrapper {
         min-height: 85vh;
-        padding: 3rem 0;
+        padding: 2rem 0; /* Reduzi um pouco o padding vertical */
     }
 
     .card-services {
@@ -36,7 +36,7 @@
         border-bottom: 1px solid #f9f9f9;
     }
 
-    /* Inputs Personalizados (Estilo Cápsula) */
+    /* Inputs Personalizados */
     .vip-input-group {
         position: relative;
         display: flex;
@@ -70,40 +70,153 @@
         font-size: 0.95rem;
         outline: none;
     }
-    
     .vip-input::placeholder { color: #ccc; }
 
-    /* Switches Personalizados */
+    /* Switches */
     .form-switch .form-check-input {
         width: 2.5em;
         height: 1.25em;
         cursor: pointer;
     }
-
-    /* Switch Ativo (Verde/Gold) */
-    .switch-active:checked {
-        background-color: #198754;
-        border-color: #198754;
-    }
-
-    /* Switch Apagar (Vermelho) */
-    .switch-delete:checked {
-        background-color: #dc3545;
-        border-color: #dc3545;
+    .switch-active:checked { background-color: #198754; border-color: #198754; }
+    .switch-delete:checked { 
+        background-color: #dc3545; 
+        border-color: #dc3545; 
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
     }
 
-    /* Efeito visual para linha deletada */
-    tr.is-deleted {
-        background-color: #fff5f5;
-        opacity: 0.6;
+    /* Linha Deletada */
+    tr.is-deleted { background-color: #fff5f5 !important; opacity: 0.6; }
+    tr.is-deleted td { text-decoration: line-through; color: #aaa; }
+    tr.is-deleted .vip-input-group { background-color: transparent; }
+
+    /* ESTILO ESPECIAL PARA A LINHA "NOVO SERVIÇO" */
+    tr.new-service-row {
+        background-color: #fffcf5; /* Fundo levemente dourado/creme */
     }
-    tr.is-deleted td {
-        text-decoration: line-through;
-        color: #aaa;
+    tr.new-service-row .vip-input-group {
+        border: 1px dashed #c5a059; /* Borda tracejada para indicar preenchimento */
+        background-color: #fff;
     }
-    tr.is-deleted .vip-input-group {
-        background-color: transparent;
+
+    /* Botão Voltar Ajustado */
+    .btn-back-custom {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        transition: all 0.2s;
+        text-decoration: none;
+        background-color: #fff;
+    }
+    .btn-back-custom:hover {
+        background-color: #f8f9fa;
+        color: #1a1a1a;
+        border-color: #ccc;
+        transform: translateX(-3px); /* Efeitinho de movimento para esquerda */
+    }
+
+    /* ========================================= */
+    /* RESPONSIVIDADE (MOBILE)                  */
+    /* ========================================= */
+    @media (max-width: 991px) {
+        .card-services {
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+        
+        .card-services .card-body { padding: 0 !important; }
+        .table-services thead { display: none; }
+        .table-services, .table-services tbody, .table-services tr, .table-services td {
+            display: block;
+            width: 100%;
+        }
+
+        /* Card Mobile Padrão */
+        .table-services tr.service-row {
+            background: #fff;
+            margin-bottom: 1.5rem;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        /* Card Mobile "NOVO" (Destaque) */
+        .table-services tr.service-row.new-service-row {
+            background-color: #fff;
+            border: 2px dashed #e0e0e0;
+            box-shadow: none;
+        }
+        
+        /* Título "Novo Serviço" no Card */
+        .table-services tr.service-row.new-service-row::before {
+            content: '+ Adicionar Novo Serviço';
+            display: block;
+            width: 100%;
+            font-weight: 700;
+            color: #c5a059;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .table-services td { padding: 0; border: none; margin-bottom: 1rem; }
+
+        /* Layout Interno */
+        .table-services td:nth-child(1) { width: 100%; order: 1; margin-bottom: 1rem; }
+        .table-services td:nth-child(2) { width: 48%; order: 2; margin-right: 4%; }
+        .table-services td:nth-child(3) { width: 48%; order: 3; }
+
+        .table-services tr.service-row::after {
+            content: ''; display: block; width: 100%; height: 1px;
+            background: #f0f0f0; margin: 0.5rem 0 1rem 0; order: 4;
+        }
+
+        .table-services td:nth-child(4) { 
+            width: 50%; order: 5; margin-bottom: 0; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
+        
+        .table-services td:nth-child(5) { 
+            width: 50%; order: 6; margin-bottom: 0; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
+
+        /* Labels dos Switches */
+        .table-services td:nth-child(4)::before {
+            content: 'Disponível'; font-size: 0.65rem; text-transform: uppercase;
+            color: #999; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: 1px;
+        }
+        
+        .table-services td:nth-child(5)::before {
+            content: 'Excluir'; font-size: 0.65rem; text-transform: uppercase;
+            color: #dc3545; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: 1px;
+        }
+
+        /* Esconde os botões de ação na linha de NOVO serviço para limpar o visual */
+        tr.new-service-row td:nth-child(4), 
+        tr.new-service-row td:nth-child(5) {
+            display: none; 
+        }
+        tr.new-service-row::after { display: none; } /* Remove a linha divisória no novo */
+
+        .card-services .card-header {
+            background: transparent;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-bottom: 0.5rem !important;
+        }
     }
 </style>
 {% endblock %}
@@ -115,15 +228,19 @@
             
             <div class="card card-services">
                 
-                <div class="card-header bg-white p-4 p-md-5 border-0 pb-0">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                <!-- Cabeçalho Ajustado: Seta à esquerda e mais espaçamento -->
+                <div class="card-header bg-white p-4 p-md-5 border-0 pb-3"> <!-- pb-3 adiciona espaço extra embaixo -->
+                    <div class="d-flex align-items-center mb-4"> <!-- Removido justify-content-between -->
+                        <!-- Botão Voltar Primeiro -->
+                        <a href="{% url 'listar_agendamentos' %}" class="btn-back-custom me-4 shadow-sm" title="Voltar">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        
+                        <!-- Títulos -->
                         <div>
                             <h3 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Catálogo de Serviços</h3>
-                            <p class="text-muted small mb-0">Defina os serviços e valores disponíveis para seus clientes.</p>
+                            <p class="text-muted small mb-0">Gerencie seus serviços e preços.</p>
                         </div>
-                        <a href="{% url 'listar_agendamentos' %}" class="btn btn-outline-light text-dark rounded-pill btn-sm border hover-shadow">
-                            <i class="fas fa-arrow-left me-1"></i> Voltar
-                        </a>
                     </div>
                 </div>
 
@@ -149,7 +266,9 @@
                                             {{ hidden }}
                                         {% endfor %}
                                         
-                                        <tr class="service-row">
+                                        <!-- Se não tem PK, é a linha de NOVO serviço -->
+                                        <tr class="service-row {% if not form.instance.pk %}new-service-row{% endif %}">
+                                            <!-- Nome -->
                                             <td class="pe-3">
                                                 <div class="vip-input-group">
                                                     <i class="fas fa-tag vip-input-icon"></i>
@@ -157,27 +276,26 @@
                                                            name="{{ form.nome.html_name }}" 
                                                            value="{{ form.nome.value|default:'' }}" 
                                                            class="vip-input" 
-                                                           placeholder="Ex: Corte Degradê">
+                                                           placeholder="Nome do Serviço">
                                                 </div>
                                                 {% if form.nome.errors %}
                                                     <small class="text-danger ps-2">{{ form.nome.errors.0 }}</small>
                                                 {% endif %}
                                             </td>
                                             
-                                            <td>
-                                                <div class="input-group">
-                                                    <span class="input-group-text bg-light border-end-0">R$</span>
-                                                    <!-- Mudamos para type="text" para evitar conflito de ponto/vírgula -->
-                                                    <input type="text" name="{{ form.preco.html_name }}" 
-                                                        value="{{ form.preco.value|default:'' }}" 
-                                                        class="form-control border-start-0" 
-                                                        placeholder="0.00">
+                                            <!-- Preço -->
+                                            <td class="pe-3">
+                                                <div class="vip-input-group">
+                                                    <span class="vip-input-icon fw-bold text-success">R$</span>
+                                                    <input type="text" 
+                                                           name="{{ form.preco.html_name }}" 
+                                                           value="{{ form.preco.value|default:'' }}" 
+                                                           class="vip-input" 
+                                                           placeholder="0.00">
                                                 </div>
-                                                {% if form.preco.errors %}
-                                                    <div class="text-danger small">{{ form.preco.errors }}</div>
-                                                {% endif %}
                                             </td>
                                             
+                                            <!-- Duração -->
                                             <td class="pe-3">
                                                 <div class="vip-input-group">
                                                     <i class="far fa-clock vip-input-icon"></i>
@@ -185,24 +303,29 @@
                                                            name="{{ form.duracao_minutos.html_name }}" 
                                                            value="{{ form.duracao_minutos.value|default:'' }}" 
                                                            class="vip-input" 
-                                                           placeholder="30">
+                                                           placeholder="Min">
                                                     <span class="text-muted small ms-1" style="font-size: 0.75rem;">min</span>
                                                 </div>
                                             </td>
                                             
+                                            <!-- Ativo (Switch) -->
                                             <td class="text-center">
                                                 <div class="form-check form-switch d-flex justify-content-center">
                                                     {{ form.ativo }}
                                                 </div>
                                             </td>
 
+                                            <!-- Apagar (Switch Vermelho) ou Ícone Novo -->
                                             <td class="text-center">
                                                 {% if form.instance.pk %}
                                                     <div class="form-check form-switch d-flex justify-content-center">
                                                         {{ form.DELETE }}
                                                     </div>
                                                 {% else %}
-                                                    <span class="text-muted small"><i class="fas fa-plus-circle text-success"></i> Novo</span>
+                                                    <!-- No Desktop mostra o badge, no Mobile o CSS oculta essa coluna -->
+                                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 border border-success border-opacity-25">
+                                                        <i class="fas fa-plus me-1"></i> Novo
+                                                    </span>
                                                 {% endif %}
                                             </td>
                                         </tr>
@@ -211,16 +334,18 @@
                             </table>
                         </div>
 
-                        <div class="mt-3 text-center">
-                            <span class="badge bg-light text-muted fw-normal">
-                                <i class="fas fa-lightbulb text-warning me-1"></i> 
-                                Dica: Preencha a linha vazia no final para adicionar um novo serviço.
-                            </span>
+                        <!-- Dica de UX Melhorada -->
+                        <div class="mt-4 p-3 rounded-3 bg-light border border-light text-center">
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-info-circle text-warning me-1"></i> 
+                                Para criar um serviço, preencha o cartão <strong>"+ Adicionar Novo Serviço"</strong> acima e clique em Salvar.
+                            </p>
                         </div>
 
-                        <div class="d-flex justify-content-end mt-5 pt-3 border-top">
-                            <button type="submit" class="btn btn-vip rounded-pill px-5 py-2 shadow-sm">
-                                <i class="fas fa-check me-2"></i>Salvar Catálogo
+                        <!-- Botão de Ação -->
+                        <div class="d-flex justify-content-end mt-4 pt-2">
+                            <button type="submit" class="btn btn-vip rounded-pill px-5 py-3 shadow-sm w-100 w-md-auto fw-bold">
+                                <i class="fas fa-save me-2"></i>Salvar Alterações
                             </button>
                         </div>
                     </form>
@@ -238,22 +363,21 @@
         const rows = document.querySelectorAll('.service-row');
 
         rows.forEach(row => {
-            // 1. Configurar Switch de "ATIVO" (4ª coluna - índice 3 no array de tds)
+            // 1. Configurar Switch de "ATIVO" (4ª coluna)
             const activeCell = row.querySelectorAll('td')[3]; 
-            const activeCheckbox = activeCell.querySelector('input[type="checkbox"]');
+            const activeCheckbox = activeCell ? activeCell.querySelector('input[type="checkbox"]') : null;
             
             if (activeCheckbox) {
                 activeCheckbox.classList.add('form-check-input', 'switch-active');
             }
 
-            // 2. Configurar Switch de "APAGAR/DELETE" (5ª coluna - índice 4)
+            // 2. Configurar Switch de "APAGAR" (5ª coluna) - Apenas se existir (não existe na linha "Novo")
             const deleteCell = row.querySelectorAll('td')[4];
-            const deleteCheckbox = deleteCell.querySelector('input[type="checkbox"]');
+            const deleteCheckbox = deleteCell ? deleteCell.querySelector('input[type="checkbox"]') : null;
 
             if (deleteCheckbox) {
                 deleteCheckbox.classList.add('form-check-input', 'switch-delete');
 
-                // Função para riscar a linha
                 const updateDeleteState = () => {
                     if (deleteCheckbox.checked) {
                         row.classList.add('is-deleted');
@@ -261,8 +385,6 @@
                         row.classList.remove('is-deleted');
                     }
                 };
-
-                // Inicializa e adiciona evento
                 updateDeleteState();
                 deleteCheckbox.addEventListener('change', updateDeleteState);
             }

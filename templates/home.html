@@ -50,11 +50,19 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
 
-    /* --- CARDS DE PROFISSIONAIS --- */
+    /* --- CARDS DE PROFISSIONAIS (CORREÇÃO DE ALINHAMENTO) --- */
     .pro-card {
-        border: none; background: #fff; border-radius: 24px; overflow: hidden;
-        transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.04);
-        height: 100%; position: relative;
+        border: none; 
+        background: #fff; 
+        border-radius: 24px; 
+        overflow: hidden;
+        transition: all 0.3s ease; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        height: 100%; 
+        position: relative;
+        /* Flexbox para garantir altura total e distribuição */
+        display: flex;
+        flex-direction: column;
     }
     .pro-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
 
@@ -62,6 +70,7 @@
         height: 140px;
         background: linear-gradient(45deg, #333, #1a1a1a);
         background-size: cover; background-position: center; position: relative;
+        flex-shrink: 0; /* Impede que a capa encolha */
     }
     .pro-cover::after {
         content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -76,14 +85,24 @@
     }
     .pro-card:hover .pro-avatar { transform: scale(1.05); border-color: #c5a059; }
 
-    .pro-info { padding: 1rem 1.5rem 1.5rem 1.5rem; }
+    /* Container de Informações Flexível */
+    .pro-info { 
+        padding: 1rem 1.5rem 1.5rem 1.5rem;
+        flex-grow: 1; /* Ocupa o espaço restante */
+        display: flex;
+        flex-direction: column;
+    }
     
     .pro-name {
         font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.2rem;
         color: #1a1a1a; margin-bottom: 0.2rem;
     }
     
-    /* TAGS DE SERVIÇOS (NOVO CSS) */
+    .pro-role {
+        color: #c5a059; font-size: 0.8rem; text-transform: uppercase;
+        letter-spacing: 1px; font-weight: 600; margin-bottom: 1.2rem;
+    }
+
     .service-tags {
         display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 1rem; min-height: 30px;
     }
@@ -93,7 +112,6 @@
         white-space: nowrap;
     }
 
-    /* Galeria e Botão */
     .pro-gallery img {
         width: 50px; height: 50px; object-fit: cover;
         border-radius: 10px; border: 2px solid #fff;
@@ -101,9 +119,33 @@
     }
     .pro-gallery img:hover { transform: scale(1.1); z-index: 5; border-color: #c5a059; }
 
-    .btn-card-action { width: 100%; border-radius: 12px; padding: 0.6rem; font-weight: 500; transition: all 0.2s; }
+    /* Botão alinhado ao rodapé do card */
+    .btn-card-action { 
+        width: 100%; border-radius: 12px; padding: 0.6rem; 
+        font-weight: 500; transition: all 0.2s;
+        margin-top: auto; /* EMPURRA O BOTÃO PARA BAIXO */
+    }
 
-    /* Modal Zoom (Mesmo CSS anterior) */
+    /* --- MAPA SECTION --- */
+    .map-container iframe {
+        border-radius: 20px 0 0 20px;
+        width: 100%;
+        height: 100%;
+        min-height: 400px;
+    }
+    
+    .info-container {
+        border-radius: 0 20px 20px 0;
+        background: #1a1a1a;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .map-container iframe { border-radius: 20px 20px 0 0; min-height: 300px; }
+        .info-container { border-radius: 0 0 20px 20px; }
+    }
+
+    /* Modal Zoom */
     #modalZoom .modal-content { background-color: transparent; border: none; box-shadow: none; position: relative; }
     #modalZoom .modal-backdrop.show { opacity: 0.9; }
     #imgZoom { max-height: 85vh; width: auto; max-width: 100%; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: contain; }
@@ -207,7 +249,7 @@
                     <h5 class="pro-name">{{ prof.first_name }} {{ prof.last_name }}</h5>
                     <div class="pro-role mb-2 text-gold small fw-bold">CABELEIREIRO VIP</div>
                     
-                    <!-- LISTA DE SERVIÇOS (NOVO!) -->
+                    <!-- LISTA DE SERVIÇOS -->
                     <div class="service-tags">
                         {% for servico in prof.servicos.all|slice:":3" %}
                             <span class="tag-item">{{ servico.nome }}</span>
@@ -234,7 +276,7 @@
                     </div>
                     {% endif %}
 
-                    <!-- Botão -->
+                    <!-- Botão (Agora com margin-top: auto para alinhar embaixo) -->
                     {% if user.is_authenticated %}
                         <a href="{% url 'novo_agendamento' %}?prof={{ prof.id }}" class="btn btn-vip btn-card-action">
                             Agendar Horário
@@ -256,6 +298,54 @@
     </div>
 </div>
 
+<!-- LOCALIZAÇÃO / MAPA (NOVO) -->
+<div class="py-5">
+    <div class="text-center mb-5">
+        <span class="text-gold text-uppercase fw-bold small letter-spacing-2">Localização</span>
+        <h2 class="fw-bold display-6 mt-1" style="font-family: 'Outfit';">Venha nos Visitar</h2>
+        <div style="width: 50px; height: 3px; background: #c5a059; margin: 1.5rem auto;"></div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                <div class="row g-0">
+                    <!-- Coluna do Mapa -->
+                    <div class="col-lg-8 map-container">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.197586022716!2d-46.65434292376269!3d-23.56134456159239!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da0aa365%3A0x4c266503d6569987!2sAv.%20Paulista%2C%201000%20-%20Bela%20Vista%2C%20S%C3%A3o%20Paulo%20-%20SP%2C%2001310-100!5e0!3m2!1spt-BR!2sbr!4v1701234567890!5m2!1spt-BR!2sbr" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                    
+                    <!-- Coluna de Informações -->
+                    <div class="col-lg-4 info-container p-5 d-flex flex-column justify-content-center">
+                        <div class="mb-4">
+                            <i class="fas fa-map-marker-alt text-gold fa-2x mb-3"></i>
+                            <h5 class="fw-bold">Endereço</h5>
+                            <p class="text-white-50 mb-0">Av. Paulista, 1000<br>São Paulo - SP</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <i class="fas fa-phone-alt text-gold fa-2x mb-3"></i>
+                            <h5 class="fw-bold">Contato</h5>
+                            <p class="text-white-50 mb-0">(11) 99999-9999<br>contato@salaovip.com</p>
+                        </div>
+
+                        <div>
+                            <i class="fas fa-clock text-gold fa-2x mb-3"></i>
+                            <h5 class="fw-bold">Horário</h5>
+                            <p class="text-white-50 mb-0">Segunda a Sábado<br>09:00 às 20:00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL ZOOM (Igual ao anterior) -->
 <div class="modal fade" id="modalZoom" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -274,7 +364,6 @@
 
 {% block extra_scripts %}
 <script>
-    // Variáveis e Funções da Galeria (Mesmo script do anterior)
     let imagensAtuais = [];
     let indiceAtual = 0;
 
