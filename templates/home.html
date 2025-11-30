@@ -4,145 +4,211 @@
 
 {% block extra_head %}
 <style>
-    /* --- HERO SECTION --- */
-    .hero-section {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
-        color: #fff;
-        padding: 5rem 2rem;
-        border-radius: 24px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    /* --- CORREÇÃO DE SCROLL LATERAL --- */
+    body {
+        overflow-x: hidden;
     }
-    .hero-section::before {
-        content: '';
+
+    /* --- HERO SECTION FULL WIDTH (LIGHT & CLEAN) --- */
+    .hero-wrapper {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        margin-top: -40px;
+        
+        /* Fundo Branco Limpo */
+        background: #fff;
+        color: #1a1a1a;
+        
+        /* AUMENTEI O PADDING INFERIOR PARA 10rem PARA DAR ESPAÇO AOS CARDS */
+        padding: 6rem 0 10rem 0; 
+        overflow: hidden;
+        margin-bottom: 0; /* Removi a margem inferior pois os cards já dão o espaço */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+    }
+
+    .hero-bg-decoration {
         position: absolute;
         top: -100px;
-        right: -100px;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, rgba(0,0,0,0) 70%);
+        right: -50px;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(197, 160, 89, 0.05) 0%, rgba(0,0,0,0) 70%);
         border-radius: 50%;
-        z-index: 0;
+        pointer-events: none;
     }
-    .hero-content { position: relative; z-index: 1; }
-    .text-gold { color: #c5a059; }
 
-    /* --- FEATURES --- */
-    .feature-card {
+    /* Conteúdo */
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -1px;
+        margin-bottom: 1.5rem;
+        color: #1a1a1a;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: #666;
+        font-weight: 400;
+        margin-bottom: 2.5rem;
+        max-width: 550px;
+        line-height: 1.6;
+    }
+
+    .text-gradient-gold {
+        background: linear-gradient(to right, #c5a059, #b08d45);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Botões Hero */
+    .btn-hero-primary {
+        background-color: #1a1a1a;
+        color: #fff;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
         border: none;
-        background: #fff;
-        padding: 2.5rem 2rem;
-        border-radius: 20px;
-        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-        height: 100%;
-        border: 1px solid rgba(0,0,0,0.02);
-    }
-    .feature-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.06);
-        border-color: transparent;
-    }
-    .icon-box {
-        width: 64px; height: 64px; background-color: #fcfcfc; color: #c5a059;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 16px; font-size: 1.6rem; margin-bottom: 1.5rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-    }
-
-    /* --- CARDS DE PROFISSIONAIS (CORREÇÃO DE ALINHAMENTO) --- */
-    .pro-card {
-        border: none; 
-        background: #fff; 
-        border-radius: 24px; 
-        overflow: hidden;
-        transition: all 0.3s ease; 
-        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
-        height: 100%; 
-        position: relative;
-        /* Flexbox para garantir altura total e distribuição */
-        display: flex;
-        flex-direction: column;
-    }
-    .pro-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
-
-    .pro-cover {
-        height: 140px;
-        background: linear-gradient(45deg, #333, #1a1a1a);
-        background-size: cover; background-position: center; position: relative;
-        flex-shrink: 0; /* Impede que a capa encolha */
-    }
-    .pro-cover::after {
-        content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
-    }
-
-    .pro-avatar {
-        width: 110px; height: 110px; object-fit: cover;
-        border-radius: 50%; border: 4px solid #fff; margin-top: -60px;
-        background: #fff; position: relative; z-index: 2;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.3s;
-    }
-    .pro-card:hover .pro-avatar { transform: scale(1.05); border-color: #c5a059; }
-
-    /* Container de Informações Flexível */
-    .pro-info { 
-        padding: 1rem 1.5rem 1.5rem 1.5rem;
-        flex-grow: 1; /* Ocupa o espaço restante */
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .pro-name {
-        font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.2rem;
-        color: #1a1a1a; margin-bottom: 0.2rem;
-    }
-    
-    .pro-role {
-        color: #c5a059; font-size: 0.8rem; text-transform: uppercase;
-        letter-spacing: 1px; font-weight: 600; margin-bottom: 1.2rem;
-    }
-
-    .service-tags {
-        display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 1rem; min-height: 30px;
-    }
-    .tag-item {
-        font-size: 0.7rem; padding: 3px 10px; border-radius: 50px;
-        background: #f8f9fa; border: 1px solid #eee; color: #666;
         white-space: nowrap;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-hero-primary:hover {
+        background-color: #c5a059;
+        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(197, 160, 89, 0.3);
+        text-decoration: none;
     }
 
-    .pro-gallery img {
-        width: 50px; height: 50px; object-fit: cover;
-        border-radius: 10px; border: 2px solid #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer;
+    .btn-hero-outline {
+        background-color: #f5f5f5;
+        color: #1a1a1a;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-block;
     }
-    .pro-gallery img:hover { transform: scale(1.1); z-index: 5; border-color: #c5a059; }
-
-    /* Botão alinhado ao rodapé do card */
-    .btn-card-action { 
-        width: 100%; border-radius: 12px; padding: 0.6rem; 
-        font-weight: 500; transition: all 0.2s;
-        margin-top: auto; /* EMPURRA O BOTÃO PARA BAIXO */
+    .btn-hero-outline:hover {
+        background-color: #e0e0e0;
+        color: #000;
+        transform: translateY(-2px);
+        text-decoration: none;
     }
 
-    /* --- MAPA SECTION --- */
-    .map-container iframe {
-        border-radius: 20px 0 0 20px;
+    /* Visual Hero */
+    .hero-visual {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .hero-image-container {
+        position: relative;
+        width: 380px;
+        height: 480px;
+        z-index: 3;
+    }
+    
+    .hero-main-image {
         width: 100%;
         height: 100%;
-        min-height: 400px;
+        object-fit: cover;
+        border-radius: 20px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.08); 
+        position: relative;
+        z-index: 2;
     }
     
-    .info-container {
-        border-radius: 0 20px 20px 0;
-        background: #1a1a1a;
-        color: white;
-    }
+    /* Formas Geométricas */
+    .geometric-shape { position: absolute; border-radius: 20px; z-index: 1; }
+    .shape-circle { width: 120px; height: 120px; border: 2px solid #c5a059; border-radius: 50%; top: -30px; right: -30px; animation: rotateShape 20s linear infinite; }
+    .shape-square { width: 100px; height: 100px; border: 1.5px solid rgba(197, 160, 89, 0.3); bottom: -20px; left: -40px; transform: rotate(15deg); animation: floatShape 6s ease-in-out infinite; }
+    .shape-rectangle { width: 150px; height: 80px; background: linear-gradient(135deg, rgba(197, 160, 89, 0.1), rgba(197, 160, 89, 0.05)); top: 50%; left: -60px; transform: translateY(-50%) rotate(-10deg); border-radius: 15px; animation: pulse 4s ease-in-out infinite; }
+    .shape-dot { width: 30px; height: 30px; background: #c5a059; border-radius: 50%; bottom: 60px; right: -40px; animation: floatDot 5s ease-in-out infinite; }
+    .shape-line { width: 2px; height: 100px; background: linear-gradient(to bottom, transparent, rgba(197, 160, 89, 0.4), transparent); top: -50px; left: 50%; transform: translateX(-50%); }
 
-    @media (max-width: 768px) {
+    @keyframes rotateShape { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes floatShape { 0%, 100% { transform: rotate(15deg) translateY(0px); } 50% { transform: rotate(15deg) translateY(-15px); } }
+    @keyframes pulse { 0%, 100% { opacity: 0.6; transform: translateY(-50%) rotate(-10deg) scale(1); } 50% { opacity: 0.8; transform: translateY(-50%) rotate(-10deg) scale(1.05); } }
+    @keyframes floatDot { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+
+    /* Features Overlap - AJUSTADO ESPAÇAMENTO */
+    .features-overlap { 
+        margin-top: -4rem; /* Reduzi o overlap negativo para descer um pouco os cards */
+        position: relative; 
+        z-index: 10; 
+        margin-bottom: 5rem; 
+    }
+    .feature-card { border: none; background: #fff; padding: 2.5rem 2rem; border-radius: 20px; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); height: 100%; box-shadow: 0 15px 40px rgba(0,0,0,0.08); border: 1px solid #f0f0f0; }
+    .feature-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.12); }
+    .icon-box { width: 64px; height: 64px; background-color: #fcfcfc; color: #c5a059; display: flex; align-items: center; justify-content: center; border-radius: 16px; font-size: 1.6rem; margin-bottom: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+
+    /* Estilos Gerais */
+    .text-gold { color: #c5a059; }
+    .pro-card { border: none; background: #fff; border-radius: 24px; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.04); height: 100%; position: relative; display: flex; flex-direction: column; }
+    .pro-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+    .pro-cover { height: 140px; background: linear-gradient(45deg, #333, #1a1a1a); background-size: cover; background-position: center; position: relative; flex-shrink: 0; }
+    .pro-cover::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.4), transparent); }
+    .pro-avatar { width: 110px; height: 110px; object-fit: cover; border-radius: 50%; border: 4px solid #fff; margin-top: -60px; background: #fff; position: relative; z-index: 2; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.3s; }
+    .pro-card:hover .pro-avatar { transform: scale(1.05); border-color: #c5a059; }
+    .pro-info { padding: 1rem 1.5rem 1.5rem 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+    .pro-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.2rem; color: #1a1a1a; margin-bottom: 0.2rem; }
+    .pro-role { color: #c5a059; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 1.2rem; }
+    .service-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 1rem; min-height: 30px; }
+    .tag-item { font-size: 0.7rem; padding: 3px 10px; border-radius: 50px; background: #f8f9fa; border: 1px solid #eee; color: #666; white-space: nowrap; }
+    .pro-gallery img { width: 50px; height: 50px; object-fit: cover; border-radius: 10px; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer; }
+    .pro-gallery img:hover { transform: scale(1.1); z-index: 5; border-color: #c5a059; }
+    .btn-card-action { width: 100%; border-radius: 12px; padding: 0.6rem; font-weight: 500; transition: all 0.2s; margin-top: auto; }
+    
+    .map-container iframe { border-radius: 20px 0 0 20px; width: 100%; height: 100%; min-height: 400px; }
+    .info-container { border-radius: 0 20px 20px 0; background: #1a1a1a; color: white; }
+
+    /* Responsividade */
+    @media (max-width: 991px) {
+        .hero-wrapper {
+            padding: 4rem 0 5rem 0;
+            text-align: center; 
+        }
+        .hero-title { font-size: 2.2rem; margin-bottom: 1rem; }
+        .hero-subtitle { font-size: 1rem; margin-bottom: 2rem; margin-left: auto; margin-right: auto; }
+        .hero-buttons-container {
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .btn-hero-primary, .btn-hero-outline {
+            width: auto; 
+            min-width: 200px; 
+            padding: 0.8rem 2rem;
+            font-size: 0.9rem;
+        }
+        .hero-visual {
+            display: flex !important;
+            margin-top: 3rem;
+        }
+        .hero-image-container {
+            width: 280px;
+            height: 350px;
+        }
+        .shape-circle { width: 80px; height: 80px; top: -20px; right: -20px; }
+        .shape-square { width: 60px; height: 60px; bottom: -10px; left: -20px; }
+        .shape-rectangle { left: -20px; width: 100px; }
         .map-container iframe { border-radius: 20px 20px 0 0; min-height: 300px; }
         .info-container { border-radius: 0 0 20px 20px; }
+        .features-overlap { margin-top: 0; }
     }
 
     /* Modal Zoom */
@@ -161,39 +227,70 @@
 
 {% block content %}
 
-<!-- HERO SECTION -->
-<div class="hero-section mb-5 text-center text-lg-start">
-    <div class="row align-items-center">
-        <div class="col-lg-7 hero-content py-3">
-            <span class="badge bg-white text-dark mb-3 px-3 py-2 rounded-pill fw-medium shadow-sm">
-                <i class="fas fa-crown text-warning me-1"></i> Experiência Premium
-            </span>
-            <h1 class="display-4 fw-bold mb-3">
-                Realce sua <span class="text-gold">Melhor Versão</span>
-            </h1>
-            <p class="lead text-white-50 mb-4" style="max-width: 600px;">
-                Cortes modernos, atendimento exclusivo e um ambiente pensado para o seu conforto. 
-                Agende seu horário em segundos.
-            </p>
-            
-            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
-                {% if not user.is_authenticated %}
-                    <a class="btn btn-vip btn-lg px-5" href="{% url 'login' %}">Entrar para Agendar</a>
-                    <a class="btn btn-outline-light btn-lg px-5 rounded-pill" href="{% url 'registro' %}">Criar Conta</a>
-                {% else %}
-                    <a class="btn btn-vip btn-lg px-5" href="{% url 'novo_agendamento' %}">Agendar Agora</a>
-                    <a class="btn btn-outline-light btn-lg px-4 rounded-pill" href="{% url 'listar_agendamentos' %}">Meus Horários</a>
-                {% endif %}
+<!-- HERO SECTION FULL WIDTH -->
+<div class="hero-wrapper">
+    <div class="hero-bg-decoration"></div>
+    
+    <div class="container h-100">
+        <div class="row align-items-center h-100">
+            <!-- Texto Hero -->
+            <div class="col-lg-7 py-5">
+                <div class="d-inline-flex align-items-center bg-white rounded-pill px-3 py-1 mb-4 border border-secondary border-opacity-10 shadow-sm">
+                    <span class="badge bg-warning text-dark me-2 rounded-pill">NOVO</span>
+                    <span class="small text-muted letter-spacing-1 fw-bold">Agendamento 100% Online</span>
+                </div>
+                
+                <h1 class="hero-title">
+                    Sua melhor versão <br>
+                    começa <span class="text-gradient-gold">aqui.</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Experiência exclusiva de barbearia e estilo. Profissionais de elite, ambiente premium e pontualidade que respeita seu tempo.
+                </p>
+                
+                <!-- Container de botões com classe específica para responsividade -->
+                <div class="d-flex flex-column flex-sm-row gap-3 hero-buttons-container">
+                    {% if not user.is_authenticated %}
+                        <a class="btn-hero-primary" href="{% url 'login' %}">
+                            Agendar Agora
+                        </a>
+                        <a class="btn-hero-outline" href="{% url 'registro' %}">
+                            Criar Conta
+                        </a>
+                    {% else %}
+                        <a class="btn-hero-primary" href="{% url 'novo_agendamento' %}">
+                            <i class="fas fa-calendar-check me-2"></i>Agendar
+                        </a>
+                        <a class="btn-hero-outline" href="{% url 'listar_agendamentos' %}">
+                            Meus Horários
+                        </a>
+                    {% endif %}
+                </div>
             </div>
-        </div>
-        <div class="col-lg-5 d-none d-lg-block text-center hero-content">
-            <i class="fas fa-cut" style="font-size: 12rem; color: rgba(255,255,255,0.03); transform: rotate(-45deg);"></i>
+            
+            <!-- Ícone/Imagem Hero (Agora visível no mobile com ajustes) -->
+            <div class="col-lg-5 hero-visual mt-5 mt-lg-0">
+                <div class="hero-image-container">
+                    <!-- Formas Geométricas -->
+                    <div class="geometric-shape shape-circle"></div>
+                    <div class="geometric-shape shape-square"></div>
+                    <div class="geometric-shape shape-rectangle"></div>
+                    <div class="geometric-shape shape-dot"></div>
+                    <div class="geometric-shape shape-line"></div>
+                    
+                    <!-- Imagem do Cabeleireiro -->
+                    <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400&h=500&fit=crop" 
+                         alt="Cabeleireiro Profissional" 
+                         class="hero-main-image">
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- FEATURES -->
-<div class="row g-4 mb-5">
+<!-- FEATURES (OVERLAP) -->
+<div class="row g-4 features-overlap">
     <div class="col-md-4">
         <div class="feature-card text-center text-md-start">
             <div class="icon-box mx-auto mx-md-0"><i class="fas fa-star"></i></div>
@@ -210,7 +307,8 @@
     </div>
     <div class="col-md-4">
         <div class="feature-card text-center text-md-start">
-            <div class="icon-box mx-auto mx-md-0"><i class="fas fa-smartphone"></i></div>
+            <!-- CORREÇÃO DO ÍCONE -->
+            <div class="icon-box mx-auto mx-md-0"><i class="fas fa-mobile-screen"></i></div>
             <h4 class="h5 fw-bold">100% Digital</h4>
             <p class="text-muted small">Controle total na palma da mão. Agende, remarque e avalie pelo app.</p>
         </div>
@@ -218,7 +316,7 @@
 </div>
 
 <!-- VITRINE DE PROFISSIONAIS -->
-<div class="py-4">
+<div class="py-5">
     <div class="text-center mb-5">
         <span class="text-gold text-uppercase fw-bold small letter-spacing-2">Nosso Time</span>
         <h2 class="fw-bold display-6 mt-1" style="font-family: 'Outfit';">Especialistas em Estilo</h2>
@@ -249,7 +347,6 @@
                     <h5 class="pro-name">{{ prof.first_name }} {{ prof.last_name }}</h5>
                     <div class="pro-role mb-2 text-gold small fw-bold">CABELEIREIRO VIP</div>
                     
-                    <!-- LISTA DE SERVIÇOS -->
                     <div class="service-tags">
                         {% for servico in prof.servicos.all|slice:":3" %}
                             <span class="tag-item">{{ servico.nome }}</span>
@@ -258,7 +355,6 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Portfolio Preview -->
                     {% if prof.portfolio.all %}
                     <div class="pro-gallery d-flex justify-content-center gap-2 mb-4 mt-3">
                         {% with fotos=prof.portfolio.all|slice:":3" %}
@@ -276,7 +372,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- Botão (Agora com margin-top: auto para alinhar embaixo) -->
                     {% if user.is_authenticated %}
                         <a href="{% url 'novo_agendamento' %}?prof={{ prof.id }}" class="btn btn-vip btn-card-action">
                             Agendar Horário
@@ -298,7 +393,7 @@
     </div>
 </div>
 
-<!-- LOCALIZAÇÃO / MAPA (NOVO) -->
+<!-- LOCALIZAÇÃO / MAPA -->
 <div class="py-5">
     <div class="text-center mb-5">
         <span class="text-gold text-uppercase fw-bold small letter-spacing-2">Localização</span>
@@ -310,7 +405,6 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
                 <div class="row g-0">
-                    <!-- Coluna do Mapa -->
                     <div class="col-lg-8 map-container">
                         <iframe 
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.197586022716!2d-46.65434292376269!3d-23.56134456159239!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da0aa365%3A0x4c266503d6569987!2sAv.%20Paulista%2C%201000%20-%20Bela%20Vista%2C%20S%C3%A3o%20Paulo%20-%20SP%2C%2001310-100!5e0!3m2!1spt-BR!2sbr!4v1701234567890!5m2!1spt-BR!2sbr" 
@@ -319,21 +413,17 @@
                             referrerpolicy="no-referrer-when-downgrade">
                         </iframe>
                     </div>
-                    
-                    <!-- Coluna de Informações -->
                     <div class="col-lg-4 info-container p-5 d-flex flex-column justify-content-center">
                         <div class="mb-4">
                             <i class="fas fa-map-marker-alt text-gold fa-2x mb-3"></i>
                             <h5 class="fw-bold">Endereço</h5>
                             <p class="text-white-50 mb-0">Av. Paulista, 1000<br>São Paulo - SP</p>
                         </div>
-                        
                         <div class="mb-4">
                             <i class="fas fa-phone-alt text-gold fa-2x mb-3"></i>
                             <h5 class="fw-bold">Contato</h5>
                             <p class="text-white-50 mb-0">(11) 99999-9999<br>contato@salaovip.com</p>
                         </div>
-
                         <div>
                             <i class="fas fa-clock text-gold fa-2x mb-3"></i>
                             <h5 class="fw-bold">Horário</h5>
@@ -346,7 +436,7 @@
     </div>
 </div>
 
-<!-- MODAL ZOOM (Igual ao anterior) -->
+<!-- MODAL ZOOM -->
 <div class="modal fade" id="modalZoom" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content text-center position-relative d-flex justify-content-center align-items-center">
