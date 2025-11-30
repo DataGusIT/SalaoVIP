@@ -125,6 +125,10 @@ LOGIN_URL = '/login/'
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles' # Pasta onde o Render vai juntar tudo
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
 # Configuração do Whitenoise para compactar e cachear arquivos
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

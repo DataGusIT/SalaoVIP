@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br" class="h-100">
 <head>
@@ -28,6 +29,30 @@
             color: var(--primary-dark);
         }
 
+        /* LOGO STYLES (ATUALIZADO) */
+        .logo-header {
+            height: 100px; /* Aumentei bastante (era 50px) */
+            width: auto;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+            
+            /* O TRUQUE: Margens negativas verticais */
+            /* Isso faz o elemento ocupar menos espaço no fluxo, permitindo que ele "vaze" sem empurrar */
+            margin-top: -30px;
+            margin-bottom: -30px;
+            
+            position: relative;
+            z-index: 100; /* Garante que fique acima de outros elementos se sobrepor */
+        }
+
+        .logo-footer {
+            height: 70px; /* Logo maior no rodapé */
+            width: auto;
+            object-fit: contain;
+            margin-bottom: 1rem;
+            border-radius: 8px; /* Suaviza os cantos se tiver fundo */
+        }
+
         /* Tipografia de Títulos */
         h1, h2, h3, h4, h5, h6, .navbar-brand {
             font-family: 'Outfit', sans-serif;
@@ -39,17 +64,17 @@
             background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            padding: 1rem 0;
+            padding: 0.8rem 0; /* Ajuste leve no padding */
         }
 
         .navbar-brand {
             color: var(--primary-dark) !important;
             font-size: 1.5rem;
             letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
         }
         
-        .navbar-brand i { color: var(--vip-gold); }
-
         .nav-link {
             color: var(--primary-dark) !important;
             font-weight: 500;
@@ -105,7 +130,7 @@
         
         main { flex: 1; padding-top: 20px; }
 
-        /* --- BOTÃO DE NOTIFICAÇÃO (ESTILO NOVO) --- */
+        /* --- BOTÃO DE NOTIFICAÇÃO --- */
         .notification-btn {
             width: 42px;
             height: 42px;
@@ -155,214 +180,102 @@
             to { transform: scale(1); }
         }
 
-        /* --- CSS GLOBAL DO SELECT CUSTOMIZADO (VIP) --- */
-        /* Esconde o Select Original onde aplicamos a classe vip-input-group */
+        /* --- SELECT CUSTOMIZADO --- */
         .vip-input-group select { display: none; }
 
-        .custom-select-wrapper {
-            position: relative;
-            user-select: none;
-            width: 100%;
-        }
+        .custom-select-wrapper { position: relative; user-select: none; width: 100%; }
 
         .custom-select-trigger {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.8rem 1rem;
-            font-size: 1rem;
-            font-weight: 400;
-            color: #333;
-            background: #fafafa;
-            border: 1px solid #f0f0f0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
+            position: relative; display: flex; align-items: center; justify-content: space-between;
+            padding: 0.8rem 1rem; font-size: 1rem; font-weight: 400; color: #333;
+            background: #fafafa; border: 1px solid #f0f0f0; border-radius: 12px;
+            cursor: pointer; transition: all 0.3s;
         }
 
         .custom-select-trigger:after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            border-right: 2px solid #c5a059;
-            border-bottom: 2px solid #c5a059;
-            transform: rotate(45deg) translateY(-2px);
-            transition: transform 0.3s;
-            margin-left: 10px;
+            content: ''; width: 10px; height: 10px; border-right: 2px solid #c5a059;
+            border-bottom: 2px solid #c5a059; transform: rotate(45deg) translateY(-2px);
+            transition: transform 0.3s; margin-left: 10px;
         }
 
         .custom-select-wrapper.open .custom-select-trigger {
-            border-color: #c5a059;
-            background: #fff;
+            border-color: #c5a059; background: #fff;
             box-shadow: 0 4px 15px rgba(197, 160, 89, 0.1);
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0; border-bottom-right-radius: 0;
         }
 
-        .custom-select-wrapper.open .custom-select-trigger:after {
-            transform: rotate(225deg) translateY(2px);
-        }
+        .custom-select-wrapper.open .custom-select-trigger:after { transform: rotate(225deg) translateY(2px); }
 
         .custom-options {
-            position: absolute;
-            display: block;
-            top: 100%;
-            left: 0;
-            right: 0;
-            border: 1px solid #c5a059;
-            border-top: 0;
-            background: #fff;
-            transition: all 0.3s;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            z-index: 100;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            max-height: 250px;
-            overflow-y: auto;
+            position: absolute; display: block; top: 100%; left: 0; right: 0;
+            border: 1px solid #c5a059; border-top: 0; background: #fff;
+            transition: all 0.3s; opacity: 0; visibility: hidden; pointer-events: none;
+            z-index: 100; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto;
         }
 
-        .custom-select-wrapper.open .custom-options {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: all;
-        }
+        .custom-select-wrapper.open .custom-options { opacity: 1; visibility: visible; pointer-events: all; }
 
         .custom-option {
-            position: relative;
-            display: block;
-            padding: 0.8rem 1rem;
-            font-size: 0.95rem;
-            font-weight: 400;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 1px solid #f9f9f9;
+            position: relative; display: block; padding: 0.8rem 1rem;
+            font-size: 0.95rem; font-weight: 400; color: #555;
+            cursor: pointer; transition: all 0.2s; border-bottom: 1px solid #f9f9f9;
         }
 
         .custom-option:last-child { border-bottom: none; }
-
-        .custom-option:hover {
-            background-color: #c5a059;
-            color: #fff;
-            padding-left: 1.5rem;
-        }
-
-        .custom-option.selected {
-            font-weight: 600;
-            color: #c5a059;
-            background-color: #fff8e1;
-        }
+        .custom-option:hover { background-color: #c5a059; color: #fff; padding-left: 1.5rem; }
+        .custom-option.selected { font-weight: 600; color: #c5a059; background-color: #fff8e1; }
         
-        /* Scrollbar fina */
         .custom-options::-webkit-scrollbar { width: 6px; }
         .custom-options::-webkit-scrollbar-thumb { background-color: #e0e0e0; border-radius: 10px; }
 
-        /* --- ESTILO DO FOOTER --- */
+        /* --- FOOTER --- */
         footer {
-            background-color: #111; 
-            color: #aaa;
-            padding-top: 4rem;
-            margin-top: auto;
-            font-size: 0.9rem;
-            border-top: none;
+            background-color: #111; color: #aaa; padding-top: 4rem;
+            margin-top: auto; font-size: 0.9rem; border-top: none;
         }
 
-        .footer-brand {
-            font-family: 'Outfit', sans-serif;
-            color: #fff;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-            text-decoration: none;
-        }
-        
-        .footer-brand i { color: var(--vip-gold); }
+        .footer-brand { display: inline-block; margin-bottom: 1rem; transition: opacity 0.3s; }
+        .footer-brand:hover { opacity: 0.8; }
 
         .footer-title {
-            color: #fff;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            margin-bottom: 1.2rem;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
+            color: #fff; font-family: 'Outfit', sans-serif; font-weight: 600;
+            margin-bottom: 1.2rem; font-size: 1.1rem; letter-spacing: 0.5px;
         }
 
         .footer-links { list-style: none; padding: 0; }
         .footer-links li { margin-bottom: 0.8rem; }
-        
-        .footer-links a {
-            color: #aaa;
-            text-decoration: none;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-        }
-        .footer-links a:hover {
-            color: var(--vip-gold);
-            padding-left: 5px;
-        }
+        .footer-links a { color: #aaa; text-decoration: none; transition: all 0.3s; display: inline-flex; align-items: center; }
+        .footer-links a:hover { color: var(--vip-gold); padding-left: 5px; }
 
         .text-gold { color: var(--vip-gold) !important; }
 
         .social-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: rgba(255,255,255,0.05);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            margin-right: 10px;
-            transition: all 0.3s;
-            text-decoration: none;
+            width: 40px; height: 40px; border-radius: 50%;
+            background-color: rgba(255,255,255,0.05); display: inline-flex;
+            align-items: center; justify-content: center; color: #fff;
+            margin-right: 10px; transition: all 0.3s; text-decoration: none;
         }
-        .social-btn:hover {
-            background-color: var(--vip-gold);
-            color: #fff;
-            transform: translateY(-3px);
-        }
+        .social-btn:hover { background-color: var(--vip-gold); color: #fff; transform: translateY(-3px); }
 
         .copyright-bar {
             border-top: 1px solid rgba(255,255,255,0.08);
-            padding: 1.5rem 0;
-            margin-top: 3rem;
-            font-size: 0.85rem;
+            padding: 1.5rem 0; margin-top: 3rem; font-size: 0.85rem;
         }
 
         /* --- TOASTS --- */
         .toast-container { z-index: 9999; padding: 1.5rem; }
-        .toast-minimal {
-            background: #fff; border: none; border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08); padding: 0;
-            overflow: hidden; margin-bottom: 1rem; max-width: 380px; position: relative;
-        }
-        .toast-minimal::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-        }
+        .toast-minimal { background: #fff; border: none; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); padding: 0; overflow: hidden; margin-bottom: 1rem; max-width: 380px; position: relative; }
+        .toast-minimal::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .toast-content { display: flex; align-items: center; padding: 1rem 1.2rem; }
-        .toast-icon-box {
-            width: 36px; height: 36px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem; margin-right: 1rem; flex-shrink: 0;
-        }
+        .toast-icon-box { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-right: 1rem; flex-shrink: 0; }
         .toast-text { flex-grow: 1; padding-right: 1rem; }
         .toast-title { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.95rem; color: #1a1a1a; display: block; }
         .toast-msg { font-size: 0.85rem; color: #666; line-height: 1.3; }
-        
-        .toast-minimal.success::before { background-color: #198754; }
-        .toast-minimal.success .toast-icon-box { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
-        .toast-minimal.error::before { background-color: #dc3545; }
-        .toast-minimal.error .toast-icon-box { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }
-        .toast-minimal.warning::before { background-color: #ffc107; }
-        .toast-minimal.warning .toast-icon-box { background-color: rgba(255, 193, 7, 0.1); color: #ffc107; }
-        .toast-minimal.info::before { background-color: #0dcaf0; }
-        .toast-minimal.info .toast-icon-box { background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
-
+        .toast-minimal.success::before { background-color: #198754; } .toast-minimal.success .toast-icon-box { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+        .toast-minimal.error::before { background-color: #dc3545; } .toast-minimal.error .toast-icon-box { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }
+        .toast-minimal.warning::before { background-color: #ffc107; } .toast-minimal.warning .toast-icon-box { background-color: rgba(255, 193, 7, 0.1); color: #ffc107; }
+        .toast-minimal.info::before { background-color: #0dcaf0; } .toast-minimal.info .toast-icon-box { background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
         .btn-close-custom { background: transparent; border: none; color: #ccc; font-size: 1rem; cursor: pointer; padding: 0; transition: color 0.3s; }
         .btn-close-custom:hover { color: #333; }
     </style>
@@ -374,7 +287,8 @@
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fas fa-scissors me-2"></i>Salão VIP
+                <!-- O Django vai buscar em static/img/logo.png -->
+                <img src="{% static 'images/logo.png' %}" alt="Salão VIP" class="logo-header">
             </a>
             
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
@@ -388,7 +302,6 @@
                     </li>
                     
                     {% if user.is_authenticated %}
-                        
                         {% if user.tipo == 'CABELEIREIRO' %}
                             <li class="nav-item">
                                 <a class="nav-link fw-bold text-dark" href="{% url 'listar_agendamentos' %}">
@@ -404,14 +317,11 @@
                             </li>
                         {% endif %}
 
-                        <!-- BOTÃO DE NOTIFICAÇÃO -->
                         <li class="nav-item ms-lg-3">
                             <a class="nav-link notification-btn" href="{% url 'listar_notificacoes' %}" title="Minhas Notificações">
                                 <i class="far fa-bell"></i>
                                 {% if notificacoes_nao_lidas > 0 %}
-                                    <span class="notification-badge">
-                                        {{ notificacoes_nao_lidas }}
-                                    </span>
+                                    <span class="notification-badge">{{ notificacoes_nao_lidas }}</span>
                                 {% endif %}
                             </a>
                         </li>
@@ -427,27 +337,16 @@
                                 {% endif %}
                                 <span>{{ user.username }}</span>
                             </a>
-                            
                             <ul class="dropdown-menu dropdown-menu-end fade-down">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'editar_perfil' %}">
-                                        <i class="fas fa-user-edit me-2"></i>Meu Perfil
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" href="{% url 'editar_perfil' %}"><i class="fas fa-user-edit me-2"></i>Meu Perfil</a></li>
                                 {% if user.is_staff %}
-                                <li>
-                                    <a class="dropdown-item" href="/admin/">
-                                        <i class="fas fa-cog me-2"></i>Painel Admin
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" href="/admin/"><i class="fas fa-cog me-2"></i>Painel Admin</a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{% url 'logout' %}" method="post" class="d-inline">
                                         {% csrf_token %}
-                                        <button type="submit" class="dropdown-item text-danger">
-                                            <i class="fas fa-sign-out-alt me-2"></i>Sair
-                                        </button>
+                                        <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Sair</button>
                                     </form>
                                 </li>
                             </ul>
@@ -471,30 +370,18 @@
                 <div class="toast toast-minimal {{ message.tags }}" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="toast-content">
                         <div class="toast-icon-box">
-                            {% if message.tags == 'success' %}
-                                <i class="fas fa-check"></i>
-                            {% elif message.tags == 'error' %}
-                                <i class="fas fa-times"></i>
-                            {% elif message.tags == 'warning' %}
-                                <i class="fas fa-exclamation"></i>
-                            {% else %}
-                                <i class="fas fa-info"></i>
-                            {% endif %}
+                            {% if message.tags == 'success' %}<i class="fas fa-check"></i>
+                            {% elif message.tags == 'error' %}<i class="fas fa-times"></i>
+                            {% elif message.tags == 'warning' %}<i class="fas fa-exclamation"></i>
+                            {% else %}<i class="fas fa-info"></i>{% endif %}
                         </div>
-
                         <div class="toast-text">
                             <span class="toast-title">
-                                {% if message.tags == 'success' %}Sucesso
-                                {% elif message.tags == 'error' %}Atenção
-                                {% elif message.tags == 'warning' %}Aviso
-                                {% else %}Informação{% endif %}
+                                {% if message.tags == 'success' %}Sucesso{% elif message.tags == 'error' %}Atenção{% elif message.tags == 'warning' %}Aviso{% else %}Informação{% endif %}
                             </span>
                             <span class="toast-msg">{{ message }}</span>
                         </div>
-
-                        <button type="button" class="btn-close-custom" data-bs-dismiss="toast" aria-label="Close">
-                            <i class="fas fa-times"></i>
-                        </button>
+                        <button type="button" class="btn-close-custom" data-bs-dismiss="toast" aria-label="Close"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
             {% endfor %}
@@ -503,21 +390,20 @@
 
     <main class="container mb-5">
         <div class="fade-in">
-            {% block content %}
-            {% endblock %}
+            {% block content %}{% endblock %}
         </div>
     </main>
 
-    <!-- FOOTER DARK PREMIUM -->
     <footer>
         <div class="container">
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
                     <a href="{% url 'home' %}" class="footer-brand">
-                        <i class="fas fa-scissors me-2"></i>Salão VIP
+                        <!-- LOGO RODAPÉ -->
+                        <img src="{% static 'images/logo.png' %}" alt="Salão VIP" class="logo-footer">
                     </a>
                     <p class="mb-4" style="line-height: 1.6; max-width: 300px;">
-                        Elevando sua autoestima com cortes exclusivos, profissionais de elite e um atendimento de primeira classe. Seu estilo é a nossa assinatura.
+                        Elevando sua autoestima com cortes exclusivos, profissionais de elite e um atendimento de primeira classe.
                     </p>
                     <div class="d-flex">
                         <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
@@ -549,7 +435,6 @@
                         <li><a href="#">Barba Terapia</a></li>
                         <li><a href="#">Pigmentação</a></li>
                         <li><a href="#">Selagem</a></li>
-                        <li><a href="#">Platinado</a></li>
                     </ul>
                 </div>
 
@@ -565,9 +450,7 @@
             </div>
 
             <div class="copyright-bar d-md-flex justify-content-between align-items-center text-center text-md-start">
-                <div class="mb-2 mb-md-0">
-                    &copy; 2025 Gustavo Moreno Souza. Todos os direitos reservados.
-                </div>
+                <div class="mb-2 mb-md-0">&copy; 2025 Gustavo Moreno Souza. Todos os direitos reservados.</div>
                 <div>
                     <a href="#" class="text-decoration-none text-secondary me-3 small hover-gold">Termos de Uso</a>
                     <a href="#" class="text-decoration-none text-secondary small hover-gold">Política de Privacidade</a>
@@ -579,7 +462,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Função Global para criar Select Customizado
         function createCustomSelect(realSelect) {
             const parent = realSelect.parentNode;
             const existingWrapper = parent.querySelector('.custom-select-wrapper');
@@ -593,10 +475,9 @@
             const trigger = document.createElement('div');
             trigger.className = 'custom-select-trigger';
             
-            // Lógica para remover os traços "----"
             const selectedOption = realSelect.options[realSelect.selectedIndex];
             let labelText = selectedOption ? selectedOption.text : 'Selecione...';
-            if(labelText.includes('----')) labelText = 'Selecione...'; // Substitui os traços
+            if(labelText.includes('----')) labelText = 'Selecione...';
             
             trigger.innerHTML = `<span>${labelText}</span>`;
             
@@ -604,7 +485,6 @@
             optionsDiv.className = 'custom-options';
 
             for (const option of realSelect.options) {
-                // Pula opções vazias ou que contenham apenas traços
                 if (option.value === "" || option.text.includes('----')) continue;
 
                 const opt = document.createElement('span');
@@ -637,7 +517,6 @@
             parent.appendChild(wrapper);
         }
 
-        // Fecha selects ao clicar fora
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.custom-select-wrapper')) {
                 document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
@@ -645,20 +524,16 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Inicializar TOASTS
             var toastElList = [].slice.call(document.querySelectorAll('.toast'))
             var toastList = toastElList.map(function (toastEl) {
                 return new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 }).show()
             });
 
-            // Inicializar TOOLTIPS
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
 
-            // Inicializar SELECTS CUSTOMIZADOS (AUTOMATICAMENTE)
-            // Procura qualquer select dentro de .vip-input-group e aplica o estilo
             const vipSelects = document.querySelectorAll('.vip-input-group select');
             vipSelects.forEach(select => {
                 createCustomSelect(select);
