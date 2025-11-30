@@ -155,18 +155,30 @@ else:
     AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
     AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL')
     
-    # Configurações adicionais para funcionar bem
-    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-    AWS_DEFAULT_ACL = 'public-read' # Arquivos são públicos para leitura
-    AWS_QUERYSTRING_AUTH = False    # Não gerar URLs com assinatura temporária
+    # --- O PULO DO GATO: Configurar URL Pública ---
+    # O endpoint vem como: https://.../storage/v1/s3
+    # A URL pública deve ser: .../storage/v1/object/public/media
     
-    # Define que a URL da mídia será a do Supabase
-    MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
-
-    # Diz ao Django para usar o S3 para arquivos de mídia
+    # 1. Removemos o protocolo (https://) e o final (/s3)
+    _url_limpa = AWS_S3_ENDPOINT_URL.split('://')[1] # Pega só o dominio
+    _url_base = _url_limpa.replace('/s3', '')        # Remove o /s3
+    
+    # 2. Montamos o endereço público correto
+    AWS_S3_CUSTOM_DOMAIN = f'{_url_base}/object/public/{AWS_STORAGE_BUCKET_NAME}'
+    
+    # Configurações adicionais
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_QUERYSTRING_AUTH = False # Importante: Não gerar links temporários com senha
+    
+    # Diz ao Django para usar o S3
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": {
+                # Forçamos o Django a usar o link público para exibir as fotos
+                "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+            },
         },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
